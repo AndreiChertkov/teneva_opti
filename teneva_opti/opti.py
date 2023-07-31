@@ -90,11 +90,18 @@ class Opti:
         return os.path.join(*fpath)
 
     def get_config(self):
+        """Return a dict with configuration of the optimizer and benchmark."""
         conf = {}
         conf['name'] = self.name
         conf['seed'] = self.seed
         conf['bm'] = self.bm.get_config()
         return conf
+
+    def get_history(self):
+        """Return a dict with optimization results."""
+        hist = {}
+        hist['bm'] = self.bm.get_history()
+        return hist
 
     def info(self, footer=''):
         """Returns a detailed description of the optimizer as text."""
@@ -139,6 +146,12 @@ class Opti:
         text += '#' * 78 + '\n'
         return text
 
+    def load(self, fpath=None):
+        """Load configuration and optimization result from npz file."""
+        fpath = path(fpath or self.fpath('data'), 'npz')
+        data = np.load(fpath, allow_pickle=True).get('data').item()
+        return data
+
     def run(self):
         self.bm.init()
         self.log.info(self.info() + '\n' + self.bm.info())
@@ -156,7 +169,10 @@ class Opti:
             self.log.wrn(f'Render is not supported for BM "{self.bm.name}"')
 
     def save(self, fpath=None):
-        raise NotImplementedError
+        """Save configuration and optimization result to npz file."""
+        data = {'config': self.get_config(), 'history': self.get_history()}
+        fpath = path(fpath or self.fpath('data'), 'npz')
+        np.savez_compressed(fpath, data=data)
 
     def show(self, fpath=None):
         if self.bm.with_show:
