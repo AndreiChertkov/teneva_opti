@@ -2,5 +2,5 @@ matplotlib>=3.7.0
 nevergrad==0.11.0
 protes==0.3.4
 teneva>=0.14.5
-teneva_bm==0.6.3
+teneva_bm==0.6.4
 ttopt==0.6.2
