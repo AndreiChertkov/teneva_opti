@@ -2,4 +2,5 @@ from teneva_opti import Opti
 
 
 class OptiTens(Opti):
-    pass
+    def target(self, i):
+        return self.target_tens(i)
