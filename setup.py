@@ -14,7 +14,9 @@ def find_packages(package, basepath):
 
 
 here = os.path.abspath(os.path.dirname(__file__))
-desc = 'Collection of various optimization methods for multivariate functions and multidimensional data arrays'
+
+
+desc = 'Collection of various optimization methods, including tensor based, for multivariate functions and multidimensional data arrays'
 with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     desc_long = f.read()
 
@@ -25,10 +27,9 @@ with open(os.path.join(here, 'teneva_opti/__init__.py'), encoding='utf-8') as f:
     version = version.group(1)
 
 
-# with open(os.path.join(here, 'requirements.txt'), encoding='utf-8') as f:
-#     requirements = f.read().split('\n')
-#     requirements = [r for r in requirements if len(r) >= 3]
-requirements = []
+with open(os.path.join(here, 'requirements.txt'), encoding='utf-8') as f:
+    requirements = f.read().split('\n')
+    requirements = [r for r in requirements if len(r) >= 3]
 
 
 setup_args = dict(
@@ -53,9 +54,8 @@ setup_args = dict(
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
-        'Framework :: Jupyter',
     ],
-    keywords='low-rank representation tensor train format TT-decomposition cross approximation als anova baselines',
+    keywords='optimization method multidimensional array multivariate function tensor train nevergrad cma ttopt protes',
     packages=find_packages('teneva_opti', './teneva_opti/'),
     python_requires='>=3.8',
     project_urls={
