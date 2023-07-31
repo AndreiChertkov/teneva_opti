@@ -1,4 +1,6 @@
-# workflow: teneva_opti
+# workflow
+
+> Workflow instructions for `teneva_opti` developers.
 
 
 ## How to install the current local version
@@ -15,32 +17,27 @@
     conda activate teneva_opti
     ```
 
-4. Install special dependencies (for developers):
+4. Install special dependencies (for developers only):
     ```bash
-    pip install sphinx twine jupyterlab
+    pip install jupyterlab twine
     ```
 
-5. Install basic dependencies:
-    ```bash
-    pip install numpy==1.22.1 scipy==1.8.1 torch==1.13.1 "jax[cpu]"==0.4.3
-    ```
-
-6. Install dependencies for all baselines (methods):
-    ```bash
-    pip install TODO
-    ```
-
-7. Install `teneva_opti`:
+5. Install `teneva_opti`: from the source:
     ```bash
     python setup.py install
     ```
 
-8. Reinstall `teneva_opti` (after updates of the code):
+6. Install `gym` and `mujoco` for `teneva_bm`:
+    ```bash
+    wget https://raw.githubusercontent.com/AndreiChertkov/teneva_bm/main/install_mujoco.py && python install_mujoco.py --env teneva_opti && rm install_mujoco.py
+    ```
+
+7. Reinstall `teneva_opti` from the source (after updates of the code):
     ```bash
     clear && pip uninstall teneva_opti -y && python setup.py install
     ```
 
-9. Delete virtual environment at the end of the work (optional):
+8. Optionally delete virtual environment at the end of the work:
     ```bash
     conda activate && conda remove --name teneva_opti --all -y
     ```
@@ -48,18 +45,21 @@
 
 ## How to update the package version
 
-1. Update version (like `0.1.X`) in the file `teneva_opti/__init__.py`
+1. Reinstall the package locally and run the demo script:
+    ```bash
+    pip uninstall teneva_opti -y && python setup.py install && clear && python demo.py
+    ```
 
-    > For breaking changes we should increase the major index (`1`), for non-breaking changes we should increase the minor index (`X`)
+2. Update version (like `0.1.X`) in `teneva_opti/__init__.py` and `README.md` files, where `X` is a new subversion number;
 
-2. Do commit `Update version (0.1.X)` and push
+3. Do commit like `Update version (0.1.X)` and push;
 
-3. Upload new version to `pypi` (login: AndreiChertkov; passw: xxx)
+4. Upload the new version to `pypi` (login: AndreiChertkov):
     ```bash
     rm -r ./dist && python setup.py sdist bdist_wheel && twine upload dist/*
     ```
 
-4. Reinstall
+5. Reinstall the package from `pypi` and check that installed version is new:
     ```bash
-    pip install --no-cache-dir --upgrade teneva_opti
+    pip uninstall teneva_opti -y && pip install --no-cache-dir --upgrade teneva_opti
     ```

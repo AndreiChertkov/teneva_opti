@@ -8,20 +8,22 @@ Collection of various optimization methods (search for the global minimum and/or
 
 ## Installation
 
-The package requires the [Python](https://www.python.org) programming language of the version >= 3.8. Please, install manually [numpy](https://numpy.org) (1.22+) and [scipy](https://www.scipy.org) (1.8+). To use the `pytorch` and `jax` versions of the code, you should also install [pytorch](https://pytorch.org/) (1.13+) and [jax[cpu]](https://github.com/google/jax) (0.4.3+) respectively. You can do it with the following command: `pip install numpy==1.22.1 scipy==1.8.1 torch==1.13.1 "jax[cpu]"==0.4.3`.
+> Current version "0.1.0".
 
-Then the package can be installed via pip: `pip install teneva_opti`. It can be also downloaded from the repository [teneva_opti](https://github.com/AndreiChertkov/teneva_opti).
+The package can be installed via pip: `pip install teneva_opti` (it requires the [Python](https://www.python.org) programming language of the version 3.8 or 3.9). It can be also downloaded from the repository [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) and installed by `python setup.py install` command from the root folder of the project.
+
+We test optimizers with benchmarks from [teneva_bm](https://github.com/AndreiChertkov/teneva_bm) library. For installation of additional dependencies (`gym` and `mujoco`) for `agent` collection , please, do the following:
+```bash
+wget https://raw.githubusercontent.com/AndreiChertkov/teneva_bm/main/install_mujoco.py && python install_mujoco.py --env teneva_opti && rm install_mujoco.py
+```
 
 
+## Documentation and examples (TODO)
 
-## Usage
-
-TODO
-
-
-## List of optimization methods
-
-TODO
+Please, run the demo script:
+```bash
+clear && python demo.py
+```
 
 
 ## Authors
@@ -29,3 +31,9 @@ TODO
 - [Andrei Chertkov](https://github.com/AndreiChertkov)
 - [Gleb Ryzhakov](https://github.com/G-Ryzhakov)
 - [Ivan Oseledets](https://github.com/oseledets)
+
+
+---
+
+
+> ✭__🚂  The stars that you give to **teneva_opti**, motivate us to develop faster and add new interesting features to the code 😃
