@@ -11,3 +11,4 @@ build/
 dist/
 _tmp/
 result/
+result_baseline/

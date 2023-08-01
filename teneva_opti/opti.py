@@ -41,6 +41,10 @@ class Opti:
         return self.bm.d
 
     @property
+    def i_opt(self):
+        return self.bm.i_max if self.is_max else self.bm.i_min
+
+    @property
     def identity(self):
         dir = []
 
@@ -82,6 +86,18 @@ class Opti:
     @property
     def n0(self):
         return self.bm.n0
+
+    @property
+    def time_full(self):
+        return self.bm.time_full
+
+    @property
+    def x_opt(self):
+        return self.bm.x_max if self.is_max else self.bm.x_min
+
+    @property
+    def y_opt(self):
+        return self.bm.y_max if self.is_max else self.bm.y_min
 
     def fpath(self, kind='log'):
         fpath = [self.fold, self.bm.name, kind, *self.identity, self.name]
@@ -153,10 +169,22 @@ class Opti:
         data = np.load(fpath, allow_pickle=True).get('data').item()
         return data
 
-    def run(self):
+    def run(self, with_raise=True):
         self.bm.init()
         self.log.info(self.info() + '\n' + self.bm.info())
-        self._optimize()
+
+        self.is_fail = False
+
+        try:
+            self._optimize()
+        except Exception as e:
+            self.is_fail = True
+            msg = f'Optimization with "{self.name}" failed [{e}]'
+            if with_raise:
+                raise ValueError(msg)
+            else:
+                self.log.wrn(msg)
+
         self.log.info(self.bm.info_history())
 
     def opts(self):

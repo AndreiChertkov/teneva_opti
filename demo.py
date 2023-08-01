@@ -2,7 +2,7 @@ from teneva_bm import *
 from teneva_opti import *
 
 
-def demo(d=100, steps=250, m=1.E+4):
+def demo(d=100, steps=250, m=1.E+3):
     bm = BmQuboKnapDet(d)
 
     opti = OptiTensTtopt(bm, m, log_info=True, log_file=True)

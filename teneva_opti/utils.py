@@ -4,7 +4,7 @@ import os
 class Log:
     def __init__(self, fpath=None, with_log=True, with_log_info=True,
                  is_file_add=False):
-        self.fpath = path(fpath, '.txt')
+        self.fpath = path(fpath, 'txt')
         self.with_log = with_log
         self.with_log_info = with_log_info
         self.is_file_new = True
