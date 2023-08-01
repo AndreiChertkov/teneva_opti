@@ -8,7 +8,7 @@ from teneva_opti import __version__
 
 
 class Opti:
-    def __init__(self, name, desc, bm, m, seed=42, fold='result',
+    def __init__(self, name, desc, bm, m, seed=0, fold='result',
                  with_cache=True, log=True, log_info=False, log_file=False):
         self.name = name
         self.desc = desc
