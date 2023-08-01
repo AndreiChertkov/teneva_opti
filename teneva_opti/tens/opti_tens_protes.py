@@ -1,7 +1,7 @@
 import jax
 # jax.config.update('jax_enable_x64', True)
 jax.config.update('jax_platform_name', 'cpu')
-jax.default_device(jax.devices('cpu')[0]);
+jax.default_device(jax.devices('cpu')[0])
 
 
 from protes import protes
@@ -63,7 +63,6 @@ class OptiTensProtes(OptiTens):
         self._k_gd = k_gd
         self._lr = lr
         self._r = r
-        return self
 
     def _optimize(self):
         if self.is_n_equal:
