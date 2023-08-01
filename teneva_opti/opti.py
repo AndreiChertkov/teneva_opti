@@ -1,7 +1,5 @@
-import nevergrad as ng
 import numpy as np
 import os
-from time import perf_counter as tpc
 
 
 from .utils import Log
@@ -21,11 +19,11 @@ class Opti:
 
         if self.bm.is_prep:
             if self.bm.budget_m != m:
-                raise ValueError
+                raise ValueError('Invalid BM configuration ("m")')
             if self.bm.budget_m_cache != m:
-                raise ValueError
+                raise ValueError('Invalid BM configuration ("m_cache")')
             if self.bm.with_cache != with_cache:
-                raise ValueError
+                raise ValueError('Invalid BM configuration ("with_cache")')
         else:
             self.bm.set_cache(with_cache)
             self.bm.set_budget(m, m_cache=m)
@@ -92,8 +90,11 @@ class Opti:
     def get_config(self):
         """Return a dict with configuration of the optimizer and benchmark."""
         conf = {}
-        conf['name'] = self.name
+        conf['d'] = self.d
+        conf['n'] = self.bm.list_convert(self.n, 'int'),
         conf['seed'] = self.seed
+        conf['name'] = self.name
+        conf['opti'] = self.__class__.__name__
         conf['bm'] = self.bm.get_config()
         return conf
 
@@ -157,10 +158,9 @@ class Opti:
         self.log.info(self.info() + '\n' + self.bm.info())
         self._optimize()
         self.log.info(self.bm.info_history())
-        return self
 
     def opts(self):
-        return self
+        return
 
     def render(self, fpath=None):
         if self.bm.with_render:
@@ -191,23 +191,3 @@ class Opti:
 
     def _optimize(self):
         raise NotImplementedError()
-
-    def _optimize_ng_helper(self, solver):
-        if not self.is_n_equal:
-            raise NotImplementedError
-
-        optimizer = solver(
-            parametrization=ng.p.TransitionChoice(range(self.n0),
-            repetitions=self.d),
-            budget=1.E+99,
-            num_workers=1)
-
-        recommendation = optimizer.provide_recommendation()
-
-        while True:
-            x = optimizer.ask()
-            i = np.array(x.value, dtype=int)
-            y = self.target(i)
-            if y is None:
-                break
-            optimizer.tell(x, y)
