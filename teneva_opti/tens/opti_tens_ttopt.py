@@ -12,6 +12,7 @@ DESC = """
     https://openreview.net/forum?id=Kf8sfv0RckB
 """
 
+
 class OptiTensTtopt(OptiTens):
     def __init__(self, *args, **kwargs):
         super().__init__('ttopt', DESC, *args, **kwargs)
@@ -38,7 +39,6 @@ class OptiTensTtopt(OptiTens):
     def opts(self, rank=4, fs_opt=1.):
         self._rank = rank
         self._fs_opt = fs_opt
-        return self
 
     def _optimize(self):
         tto = TTOpt(f=self.target, d=self.d, n=self.n,
