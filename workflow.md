@@ -50,9 +50,9 @@
     pip uninstall teneva_opti -y && python setup.py install && clear && python demo.py
     ```
 
-2. Update version (like `0.1.X`) in `teneva_opti/__init__.py` and `README.md` files, where `X` is a new subversion number;
+2. Update version (like `0.2.X`) in `teneva_opti/__init__.py` and `README.md` files, where `X` is a new subversion number;
 
-3. Do commit like `Update version (0.1.X)` and push;
+3. Do commit like `Update version (0.2.X)` and push;
 
 4. Upload the new version to `pypi` (login: AndreiChertkov):
     ```bash
