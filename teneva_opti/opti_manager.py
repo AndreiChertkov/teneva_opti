@@ -60,6 +60,8 @@ class OptiManager:
             bm = Bm(**args)
             if 'bm_opts' in task:
                 bm.set_opts(task['bm_opts'])
+            if 'bm_seed' in task:
+                bm.set_seed(task['bm_seed'])
 
             # Create Opti class instance:
             Opti = task['opti']
