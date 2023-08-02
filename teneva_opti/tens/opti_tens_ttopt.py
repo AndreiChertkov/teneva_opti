@@ -19,29 +19,29 @@ class OptiTensTtopt(OptiTens):
 
     def get_config(self):
         conf = super().get_config()
-        conf['_rank'] = self._rank
-        conf['_fs_opt'] = self._fs_opt
+        conf['rank'] = self.rank
+        conf['fs_opt'] = self.fs_opt
         return conf
 
     def info(self, footer=''):
         text = ''
 
-        text += '_rank (TT-rank)                          : '
-        v = self._rank
+        text += 'rank (TT-rank)                           : '
+        v = self.rank
         text += f'{v}\n'
 
-        text += '_fs_opt (transformation option)          : '
-        v = self._fs_opt
+        text += 'fs_opt (transformation option)           : '
+        v = self.fs_opt
         text += f'{v}\n'
 
         return super().info(text + footer)
 
     def opts(self, rank=4, fs_opt=1.):
-        self._rank = rank
-        self._fs_opt = fs_opt
+        self.rank = rank
+        self.fs_opt = fs_opt
 
     def _optimize(self):
         tto = TTOpt(f=self.target, d=self.d, n=self.n,
             evals=1.E+99, is_func=False, is_vect=True)
-        tto.optimize(rank=self._rank, seed=self.seed,
-            fs_opt=self._fs_opt, is_max=self.is_max)
+        tto.optimize(rank=self.rank, seed=self.seed,
+            fs_opt=self.fs_opt, is_max=self.is_max)

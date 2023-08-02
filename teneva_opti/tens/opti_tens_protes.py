@@ -25,51 +25,51 @@ class OptiTensProtes(OptiTens):
 
     def get_config(self):
         conf = super().get_config()
-        conf['_k'] = self._k
-        conf['_k_top'] = self._k_top
-        conf['_k_gd'] = self._k_gd
-        conf['_lr'] = self._lr
-        conf['_r'] = self._r
+        conf['k'] = self.k
+        conf['k_top'] = self.k_top
+        conf['k_gd'] = self.k_gd
+        conf['lr'] = self.lr
+        conf['r'] = self.r
         return conf
 
     def info(self, footer=''):
         text = ''
 
-        text += '_k (batch size)                          : '
-        v = self._k
+        text += 'k (batch size)                           : '
+        v = self.k
         text += f'{v}\n'
 
-        text += '_k_top (number of selected candidates)   : '
-        v = self._k_top
+        text += 'k_top (number of selected candidates)    : '
+        v = self.k_top
         text += f'{v}\n'
 
-        text += '_k_gd (number of gradient lifting iters) : '
-        v = self._k_gd
+        text += 'k_gd (number of gradient lifting iters)  : '
+        v = self.k_gd
         text += f'{v}\n'
 
-        text += '_lr (learning rate for gradient lifting) : '
-        v = self._lr
+        text += 'lr (learning rate for gradient lifting)  : '
+        v = self.lr
         text += f'{v}\n'
 
-        text += '_r (TT-rank of the inner prob tensor)    : '
-        v = self._r
+        text += 'r (TT-rank of the inner prob tensor)     : '
+        v = self.r
         text += f'{v}\n'
 
         return super().info(text + footer)
 
     def opts(self, k=100, k_top=10, k_gd=1, lr=5.E-2, r=5):
-        self._k = k
-        self._k_top = k_top
-        self._k_gd = k_gd
-        self._lr = lr
-        self._r = r
+        self.k = k
+        self.k_top = k_top
+        self.k_gd = k_gd
+        self.lr = lr
+        self.r = r
 
     def _optimize(self):
         if self.is_n_equal:
             protes(self.target, self.d, self.n0, 1.E+99,
-                k=self._k, k_top=self._k_top, k_gd=self._k_gd, lr=self._lr,
-                r=self._r, seed=self.seed, is_max=self.is_max)
+                k=self.k, k_top=self.k_top, k_gd=self.k_gd, lr=self.lr,
+                r=self.r, seed=self.seed, is_max=self.is_max)
         else:
             protes_general(self.target, self.n, 1.E+99,
-                k=self._k, k_top=self._k_top, k_gd=self._k_gd, lr=self._lr,
-                r=self._r, seed=self.seed, is_max=self.is_max)
+                k=self.k, k_top=self.k_top, k_gd=self.k_gd, lr=self.lr,
+                r=self.r, seed=self.seed, is_max=self.is_max)
