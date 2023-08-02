@@ -1,6 +1,9 @@
+gekko==1.0.6
 matplotlib>=3.7.0
+networkx==3.0
 nevergrad==0.11.0
 protes==0.3.4
+qubogen==0.1.1
 teneva>=0.14.5
 teneva_bm==0.7.0
 ttopt==0.6.2
