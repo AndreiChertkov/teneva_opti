@@ -10,7 +10,9 @@ from teneva_opti import __version__
 
 class Opti:
     def __init__(self, name, desc, bm, m=1.E+4, seed=0, fold='result_demo',
-                 with_cache=True, log=True, log_info=False, log_file=False):
+                 with_cache=True, log=True, log_info=False, log_file=False,
+                 machine=''):
+        self.machine = machine
         self.name = name
         self.desc = desc
         self.seed = seed
@@ -93,6 +95,7 @@ class Opti:
         conf['m'] = self.m
         conf['seed'] = self.seed
         conf['name'] = self.name
+        conf['machine'] = self.machine
         conf['opti'] = self.__class__.__name__
         conf['bm'] = self.bm.get_config()
         return conf
@@ -133,6 +136,11 @@ class Opti:
         text += 'Random seed                              : '
         v = self.seed
         text += f'{v}\n'
+
+        if self.machine:
+            text += 'Used machine                             : '
+            v = self.machine
+            text += f'{v}\n'
 
         text += 'Computation budget                       : '
         v = self.m
