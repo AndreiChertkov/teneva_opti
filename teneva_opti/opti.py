@@ -34,7 +34,7 @@ class Opti:
             self.bm.prep()
 
         self.log = Log(self.fpath('log') if log_file else None, log, log_info)
-        self.bm.set_log(self.log if log else False, prefix=self.name,
+        self.bm.set_log(self.log, prefix=self.name,
             cond=('max' if self.is_max else 'min'),
             with_max=self.is_max, with_min=not self.is_max)
 
