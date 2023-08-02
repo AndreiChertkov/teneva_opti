@@ -8,9 +8,10 @@ from .utils import path
 
 
 class OptiManager:
-    def __init__(self, tasks, fold='result_demo_baseline'):
+    def __init__(self, tasks, fold='result', machine=''):
         self.tasks = tasks
         self.fold = fold
+        self.machine = machine
 
         fpath = os.path.join(self.fold, 'log_manager')
         self.log = Log(fpath)
@@ -21,6 +22,7 @@ class OptiManager:
         args['log'] = args.get('log', False)
         args['log_info'] = args.get('log_info', True)
         args['log_file'] = args.get('log_file', True)
+        args['machine'] = args.get('machine', self.machine)
         return args
 
     def info(self, bm, opti, len_max=21):
