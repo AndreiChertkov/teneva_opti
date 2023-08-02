@@ -18,25 +18,25 @@ class OptiTensOptimatt(OptiTens):
 
     def get_config(self):
         conf = super().get_config()
-        conf['_dr_max'] = self._dr_max
+        conf['dr_max'] = self.dr_max
         return conf
 
     def info(self, footer=''):
         text = ''
 
-        text += '_dr_max (max rank increment)             : '
-        v = self._dr_max
+        text += 'dr_max (max rank increment)              : '
+        v = self.dr_max
         text += f'{v}\n'
 
         return super().info(text + footer)
 
-    def opts(self, dr_max=2):
-        self._dr_max = dr_max
+    def set_opts(self, dr_max=2):
+        self.dr_max = dr_max
 
     def _optimize(self):
         Y = teneva.rand(self.n, r=1)
         Y = teneva.cross(self.target, Y, e=1.E-16, m=self.bm.budget_m-2,
-            dr_max=self._dr_max)
+            dr_max=self.dr_max)
         Y = teneva.truncate(Y, e=1.E-16)
 
         i_min, y_min, i_max, y_max = teneva.optima_tt(Y)

@@ -57,7 +57,7 @@ class OptiTensProtes(OptiTens):
 
         return super().info(text + footer)
 
-    def opts(self, k=100, k_top=10, k_gd=1, lr=5.E-2, r=5):
+    def set_opts(self, k=100, k_top=10, k_gd=1, lr=5.E-2, r=5):
         self.k = k
         self.k_top = k_top
         self.k_gd = k_gd

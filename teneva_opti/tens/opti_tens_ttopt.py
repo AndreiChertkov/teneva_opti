@@ -36,7 +36,7 @@ class OptiTensTtopt(OptiTens):
 
         return super().info(text + footer)
 
-    def opts(self, rank=4, fs_opt=1.):
+    def set_opts(self, rank=4, fs_opt=1.):
         self.rank = rank
         self.fs_opt = fs_opt
 

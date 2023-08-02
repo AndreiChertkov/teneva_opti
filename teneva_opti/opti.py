@@ -37,7 +37,7 @@ class Opti:
 
         self.is_fail = False
 
-        self.opts()
+        self.set_opts()
 
     @property
     def d(self):
@@ -165,13 +165,10 @@ class Opti:
 
         self.log.info(self.bm.info_history())
 
-    def opts(self):
-        return
-
-    def render(self, fpath=None):
+    def render(self, fpath=None, with_wrn=True):
         if self.bm.with_render:
             return self.bm.render(fpath or self.fpath('render'))
-        else:
+        elif with_wrn:
             self.log.wrn(f'Render is not supported for BM "{self.bm.name}"')
 
     def save(self, fpath=None):
@@ -180,10 +177,13 @@ class Opti:
         fpath = path(fpath or self.fpath('data'), 'npz')
         np.savez_compressed(fpath, data=data)
 
-    def show(self, fpath=None):
+    def set_opts(self):
+        return
+
+    def show(self, fpath=None, with_wrn=True):
         if self.bm.with_show:
             return self.bm.show(fpath or self.fpath('show'))
-        else:
+        elif with_wrn:
             self.log.wrn(f'Show is not supported for BM "{self.bm.name}"')
 
     def target(self, inp):

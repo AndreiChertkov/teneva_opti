@@ -6,7 +6,7 @@ def demo(d=100, steps=250, m=1.E+3):
     bm = BmQuboKnapDet(d)
 
     opti = OptiTensTtopt(bm, m, log_info=True, log_file=True)
-    opti.opts(rank=4)
+    opti.set_opts(rank=4)
     opti.run()
     opti.save()
 
@@ -22,7 +22,7 @@ def demo(d=100, steps=250, m=1.E+3):
     bm = BmAgentSwimmer(steps=steps)
 
     opti = OptiTensTtopt(bm, m, log_info=True, log_file=True)
-    opti.opts(rank=4)
+    opti.set_opts(rank=4)
     opti.run()
     opti.render()
     opti.show()
