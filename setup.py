@@ -55,7 +55,7 @@ setup_args = dict(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    keywords='optimization method multidimensional array multivariate function tensor train nevergrad cma ttopt protes',
+    keywords='optimization method multidimensional array multivariate function tensor train nevergrad cma ttopt protes genetic algorithm evolutionary strategy',
     packages=find_packages('teneva_opti', './teneva_opti/'),
     python_requires='>=3.8',
     project_urls={
