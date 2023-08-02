@@ -3,62 +3,76 @@ import os
 
 
 from .utils import Log
+from .utils import get_identity_str
 from .utils import path
 
 
 class OptiManager:
-    def __init__(self, bms, optis, m=1.E+4, fold='result'):
-        self.bms = bms
-        self.optis = optis
-        self.m = int(m)
+    def __init__(self, tasks, fold='result_demo_baseline'):
+        self.tasks = tasks
         self.fold = fold
 
-        fpath = path(os.path.join(self.fold, 'log'))
+        fpath = os.path.join(self.fold, 'log_manager')
         self.log = Log(fpath)
 
-    def info(self, opti):
-        name = opti.name[:26]
-        task = 'max' if opti.is_max else 'min'
+    def build_args(self, args, bm):
+        args['bm'] = args.get('bm', bm)
+        args['fold'] = args.get('fold', self.fold)
+        args['log'] = args.get('log', False)
+        args['log_info'] = args.get('log_info', True)
+        args['log_file'] = args.get('log_file', True)
+        return args
 
-        text = name + ' '*(27-len(name)) + ' | '
+    def info(self, bm, opti, len_max=21):
+        text = ''
+
+        name = bm.name[:(len_max-1)]
+        text += '\n'
+        text += '- BM   > ' + name + ' '*(len_max-len(name))
+        text += ' [' + get_identity_str(bm, pretty=True) + ']'
+
+        name = opti.name[:(len_max-1)]
+        text += '\n'
+        text += '- OPTI > ' + name + ' '*(len_max-len(name))
+        text += ' [' + get_identity_str(opti, pretty=True) + ']'
+
+        return text
+
+    def info_history(self, opti, len_max=27):
+        text = '  >>>>>> '
 
         if opti.is_fail:
             text += f'FAIL'
         else:
-            text += f'{task} {opti.y_opt:-10.3e} | '
-            text += f'time {opti.time_full:-7.1e} | '
-
-        return text
-
-    def info_bm(self, opti):
-        name = opti.bm.name[:19]
-
-        text = '>>> BM ' + name + ' '*(20-len(name))
-        if len(opti.identity):
-            text += ' [' + ', '.join(opti.identity) + ']'
+            task = 'max' if opti.is_max else 'min'
+            text += f'{task}: {opti.y_opt:-14.5e}   '
+            text += f'[time: {opti.time_full:-8.1e}]'
 
         return text
 
     def run(self):
-        for i, bm in enumerate(self.bms, 1):
-            for j, Opti in enumerate(self.optis, 1):
-                opti = Opti(bm, self.m, fold=self.fold,
-                    log=False, log_info=True, log_file=True)
+        for task in self.tasks:
+            # Create Bm class instance:
+            Bm = task['bm']
+            args = task.get('bm_args', {})
+            bm = Bm(**args)
+            if 'bm_opts' in task:
+                bm.set_opts(task['bm_opts'])
 
-                if j == 1:
-                    self.log(self.info_bm(opti) + '\n')
+            # Create Opti class instance:
+            Opti = task['opti']
+            args = self.build_args(task.get('opti_args', {}), bm)
+            opti = Opti(**args)
+            if 'opti_opts' in task:
+                opti.set_opts(task['opti_opts'])
 
-                opti.run(with_raise=False)
-                self.log(self.info(opti))
+            # Run the optimization:
+            self.log(self.info(bm, opti))
+            opti.run(with_err=False)
+            self.log(self.info_history(opti))
 
-                if opti.is_fail:
-                    continue
-
-                opti.save()
-
-                if opti.bm.with_render:
-                    opti.render()
-                if opti.bm.with_show:
-                    opti.show()
-
-            self.log('\n')
+            # Save the results:
+            opti.save()
+            if not opti.is_fail:
+                opti.render(with_wrn=False)
+                opti.show(with_wrn=False)
