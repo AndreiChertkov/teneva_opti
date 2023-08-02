@@ -19,6 +19,19 @@ def demo(d=100, steps=250, m=1.E+3):
 
     print('\n\n')
 
+    opti = OptiTensProtes(bm, m, seed=42, log_info=True, log_file=True)
+    opti.run()
+    opti.save()
+
+    print('\n\n')
+
+    bm = BmQuboKnapDet(d)
+    opti = OptiTensProtes(bm, m*2, seed=42, log_info=True, log_file=True)
+    opti.run()
+    opti.save()
+
+    print('\n\n')
+
     bm = BmAgentSwimmer(steps=steps)
 
     opti = OptiTensTtopt(bm, m, log_info=True, log_file=True)
