@@ -89,7 +89,8 @@ class Opti:
         """Return a dict with configuration of the optimizer and benchmark."""
         conf = {}
         conf['d'] = self.d
-        conf['n'] = self.bm.list_convert(self.n, 'int'),
+        conf['n'] = self.bm.list_convert(self.n, 'int')
+        conf['m'] = self.m
         conf['seed'] = self.seed
         conf['name'] = self.name
         conf['opti'] = self.__class__.__name__
@@ -131,6 +132,10 @@ class Opti:
 
         text += 'Random seed                              : '
         v = self.seed
+        text += f'{v}\n'
+
+        text += 'Computation budget                       : '
+        v = self.m
         text += f'{v}\n'
 
         text += 'Optimizer                                : '
