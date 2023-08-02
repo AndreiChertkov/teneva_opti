@@ -9,12 +9,13 @@ from teneva_opti import __version__
 
 
 class Opti:
-    def __init__(self, name, desc, bm, m, seed=0, fold='result_demo',
+    def __init__(self, name, desc, bm, m=1.E+4, seed=0, fold='result_demo',
                  with_cache=True, log=True, log_info=False, log_file=False):
         self.name = name
         self.desc = desc
         self.seed = seed
         self.fold = fold
+        self.m = int(m)
 
         self.bm = bm
 
@@ -49,7 +50,7 @@ class Opti:
 
     @property
     def identity(self):
-        return ['seed']
+        return ['seed', 'm']
 
     @property
     def is_max(self):
@@ -98,6 +99,7 @@ class Opti:
     def get_history(self):
         """Return a dict with optimization results."""
         hist = {}
+        hist['err'] = 'Fail' if self.is_fail else ''
         hist['bm'] = self.bm.get_history()
         return hist
 
