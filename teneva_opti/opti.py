@@ -3,12 +3,13 @@ import os
 
 
 from .utils import Log
+from .utils import get_identity_str
 from .utils import path
 from teneva_opti import __version__
 
 
 class Opti:
-    def __init__(self, name, desc, bm, m, seed=0, fold='result',
+    def __init__(self, name, desc, bm, m, seed=0, fold='result_demo',
                  with_cache=True, log=True, log_info=False, log_file=False):
         self.name = name
         self.desc = desc
@@ -29,10 +30,12 @@ class Opti:
             self.bm.set_budget(m, m_cache=m)
             self.bm.prep()
 
-        self.log = Log(self.fpath() if log_file else None, log, log_info)
-        self.bm.set_log(self.log, prefix=self.name,
+        self.log = Log(self.fpath('log') if log_file else None, log, log_info)
+        self.bm.set_log(self.log if log else False, prefix=self.name,
             cond=('max' if self.is_max else 'min'),
             with_max=self.is_max, with_min=not self.is_max)
+
+        self.is_fail = False
 
         self.opts()
 
@@ -46,30 +49,7 @@ class Opti:
 
     @property
     def identity(self):
-        dir = []
-
-        for id in self.bm.identity:
-            v = getattr(self.bm, id)
-
-            if isinstance(v, (list, np.ndarray)):
-                if isinstance(v[0], float):
-                    self.log.err('Float bm identity is not supported')
-                v = self.bm.list_convert(v, 'int')
-
-            if isinstance(v, (list, np.ndarray)):
-                self.log.err('List-like bm identity is not supported')
-
-            if isinstance(v, float):
-                self.log.err('Float bm identity is not supported')
-
-            if isinstance(v, bool):
-                if not v:
-                    continue
-                dir.append(f'{id}')
-            else:
-                dir.append(f'{id}-{v}')
-
-        return dir
+        return ['seed']
 
     @property
     def is_max(self):
@@ -99,9 +79,10 @@ class Opti:
     def y_opt(self):
         return self.bm.y_max if self.is_max else self.bm.y_min
 
-    def fpath(self, kind='log'):
-        fpath = [self.fold, self.bm.name, kind, *self.identity, self.name]
-        return os.path.join(*fpath)
+    def fpath(self, kind):
+        id = get_identity_str(self)
+        id_bm = get_identity_str(self.bm)
+        return os.path.join(self.fold, self.bm.name, kind, id_bm, id, self.name)
 
     def get_config(self):
         """Return a dict with configuration of the optimizer and benchmark."""
@@ -169,7 +150,7 @@ class Opti:
         data = np.load(fpath, allow_pickle=True).get('data').item()
         return data
 
-    def run(self, with_raise=True):
+    def run(self, with_err=True):
         self.bm.init()
         self.log.info(self.info() + '\n' + self.bm.info())
 
@@ -179,11 +160,8 @@ class Opti:
             self._optimize()
         except Exception as e:
             self.is_fail = True
-            msg = f'Optimization with "{self.name}" failed [{e}]'
-            if with_raise:
-                raise ValueError(msg)
-            else:
-                self.log.wrn(msg)
+            msg = f'Optimization with "{self.name}" is failed [{e}]'
+            self.log.err(msg) if with_err else self.log.wrn(msg)
 
         self.log.info(self.bm.info_history())
 
