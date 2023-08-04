@@ -8,7 +8,7 @@ Collection of various optimization methods (search for the global minimum and/or
 
 ## Installation
 
-> Current version "0.3.3".
+> Current version "0.3.4".
 
 The package can be installed via pip: `pip install teneva_opti` (it requires the [Python](https://www.python.org) programming language of the version 3.8 or 3.9). It can be also downloaded from the repository [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) and installed by `python setup.py install` command from the root folder of the project.
 
