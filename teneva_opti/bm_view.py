@@ -51,8 +51,12 @@ class BmView:
         self.op_seed_list.append(bm.op_seed)
         self.y_opt_list.append(bm.y_opt)
         self.t_list.append(bm.t)
+        if bm.is_fail:
+            self.is_fail = True
 
     def get(self, kind='mean', is_time=False):
+        if self.is_fail:
+            return None
         if self.is_group:
             if kind == 'best':
                 return self.t_best if is_time else self.y_opt_best
@@ -90,6 +94,8 @@ class BmView:
 
         self.t = bm.t
 
+        self.is_fail = True if self.op_history['err'] else False
+
         self.is_init = True
 
     def init_from_data(self, data):
@@ -119,6 +125,8 @@ class BmView:
 
         self.t = self.bm_history['time_full']
 
+        self.is_fail = True if self.op_history['err'] else False
+
         self.is_init = True
 
     def is_better(self, value, kind='mean', is_time=False):
@@ -126,6 +134,8 @@ class BmView:
             return True
 
         v = self.get(kind, is_time)
+        if v is None:
+            return False
 
         if is_time:
             return v < value
@@ -148,8 +158,11 @@ class BmView:
     def info_table(self, prec=2, value_best=None, kind='mean', is_time=False):
         form = '{:-10.' + str(prec) + 'e}'
 
-        v = self.get(kind, is_time)
-        v = form.format(v).strip()
+        if self.is_fail:
+            v = 'FAIL'
+        else:
+            v = self.get(kind, is_time)
+            v = form.format(v).strip()
 
         if value_best is not None:
             value_best = form.format(value_best).strip()
@@ -184,26 +197,32 @@ class BmView:
         task = 'max' if self.is_max else 'min'
 
         if self.is_group:
-            text += '\n'
-            text += '  > BEST >> '
-            text += f'{task}: {self.y_opt_best:-14.5e}   '
-            text += f'[time: {self.t_best:-8.1e}]'
+            if self.is_fail:
+                text += '\n          ***FAIL***'
+            else:
+                text += '\n'
+                text += '  > BEST >> '
+                text += f'{task}: {self.y_opt_best:-14.5e}   '
+                text += f'[time: {self.t_best:-8.1e}]'
 
-            text += '\n'
-            text += '  > MEAN >> '
-            text += f'{task}: {self.y_opt_mean:-14.5e}   '
-            text += f'[time: {self.t_mean:-8.1e}]'
+                text += '\n'
+                text += '  > MEAN >> '
+                text += f'{task}: {self.y_opt_mean:-14.5e}   '
+                text += f'[time: {self.t_mean:-8.1e}]'
 
-            text += '\n'
-            text += '  > WRST >> '
-            text += f'{task}: {self.y_opt_wrst:-14.5e}   '
-            text += f'[time: {self.t_wrst:-8.1e}]'
+                text += '\n'
+                text += '  > WRST >> '
+                text += f'{task}: {self.y_opt_wrst:-14.5e}   '
+                text += f'[time: {self.t_wrst:-8.1e}]'
 
         else:
             text += '\n'
             text += '  >>>>>> '
-            text += f'{task}: {self.y_opt:-14.5e}   '
-            text += f'[time: {self.t:-8.1e}]'
+            if self.is_fail:
+                text += ' ***FAIL***'
+            else:
+                text += f'{task}: {self.y_opt:-14.5e}   '
+                text += f'[time: {self.t:-8.1e}]'
 
         return text
 
