@@ -5,5 +5,5 @@ nevergrad==0.11.0
 protes==0.3.4
 qubogen==0.1.1
 teneva>=0.14.5
-teneva_bm==0.7.0
+teneva_bm==0.7.1
 ttopt==0.6.2
