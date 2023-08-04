@@ -40,6 +40,7 @@ class Opti:
 
         self.is_fail = False
 
+        self.init()
         self.set_opts()
 
     @property
@@ -170,6 +171,9 @@ class Opti:
 
         text += '#' * 78 + '\n'
         return text
+
+    def init(self):
+        return
 
     def load(self, fpath=None):
         """Load configuration and optimization result from npz file."""

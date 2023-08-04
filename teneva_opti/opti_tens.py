@@ -5,11 +5,63 @@ from teneva_opti import Opti
 
 class OptiTens(Opti):
     @property
+    def d_inner(self):
+        if self.with_quan:
+            return self.d * int(np.log2(self.n0))
+        return self.d
+
+    @property
     def is_tens(self):
         return True
 
+    @property
+    def n_inner(self):
+        if self.with_quan:
+            return np.array([2]*self.d_inner, dtype=int)
+        return self.n
+
+    @property
+    def n0_inner(self):
+        if self.with_quan:
+            return 2
+        return self.n0
+
+    @property
+    def with_quan(self):
+        if not self.quan:
+            return False
+        if not self.is_n_equal:
+            return False
+        if 2**int(np.log2(self.n0)) != self.n0:
+            return False
+        return True
+
+    def init(self):
+        self.quan = False
+
     def target(self, i):
+        if self.with_quan:
+            i = self.unquantize(i)
         return self.target_tens(i)
+
+    def unquantize(self, I_qtt):
+        if len(I_qtt.shape) == 1:
+            is_many = False
+            I_qtt = I_qtt.reshape(1, -1)
+        else:
+            is_many = True
+
+        d = self.d
+        q = int(np.log2(self.n0))
+        n = [2] * q
+        m = I_qtt.shape[0]
+
+        I = np.zeros((m, d), dtype=I_qtt.dtype)
+        for k in range(d):
+            I_qtt_curr = I_qtt[:, q*k:q*(k+1)].T
+            I[:, k] = np.ravel_multi_index(I_qtt_curr, n, order='F')
+
+        return I if is_many else I[0, :]
 
     def _optimize_ng_helper(self, solver):
         if not self.is_n_equal:

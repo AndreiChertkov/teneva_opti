@@ -21,6 +21,8 @@ class OptiTensTtopt(OptiTens):
         conf = super().get_config()
         conf['rank'] = self.rank
         conf['fs_opt'] = self.fs_opt
+        conf['quan'] = self.quan
+        conf['with_quan'] = self.with_quan
         return conf
 
     def info(self, footer=''):
@@ -34,14 +36,20 @@ class OptiTensTtopt(OptiTens):
         v = self.fs_opt
         text += f'{v}\n'
 
+        if self.with_quan:
+            text += 'quan (use quantization of tensor modes)  : '
+            v = 'YES' if self.with_quan else 'no'
+            text += f'{v}\n'
+
         return super().info(text + footer)
 
-    def set_opts(self, rank=4, fs_opt=1.):
+    def set_opts(self, rank=4, fs_opt=1., quan=True):
         self.rank = rank
         self.fs_opt = fs_opt
+        self.quan = quan
 
     def _optimize(self):
-        tto = TTOpt(f=self.target, d=self.d, n=self.n,
+        tto = TTOpt(f=self.target, d=self.d_inner, n=self.n_inner,
             evals=1.E+99, is_func=False, is_vect=True)
         tto.optimize(rank=self.rank, seed=self.seed,
             fs_opt=self.fs_opt, is_max=self.is_max)

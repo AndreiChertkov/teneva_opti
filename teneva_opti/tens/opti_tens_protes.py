@@ -30,6 +30,8 @@ class OptiTensProtes(OptiTens):
         conf['k_gd'] = self.k_gd
         conf['lr'] = self.lr
         conf['r'] = self.r
+        conf['quan'] = self.quan
+        conf['with_quan'] = self.with_quan
         return conf
 
     def info(self, footer=''):
@@ -55,21 +57,27 @@ class OptiTensProtes(OptiTens):
         v = self.r
         text += f'{v}\n'
 
+        if self.with_quan:
+            text += 'quan (use quantization of tensor modes)  : '
+            v = 'YES' if self.with_quan else 'no'
+            text += f'{v}\n'
+
         return super().info(text + footer)
 
-    def set_opts(self, k=100, k_top=10, k_gd=1, lr=5.E-2, r=5):
+    def set_opts(self, k=100, k_top=10, k_gd=1, lr=5.E-2, r=5, quan=True):
         self.k = k
         self.k_top = k_top
         self.k_gd = k_gd
         self.lr = lr
         self.r = r
+        self.quan = quan
 
     def _optimize(self):
         if self.is_n_equal:
-            protes(self.target, self.d, self.n0, 1.E+99,
+            protes(self.target, self.d_inner, self.n0_inner, 1.E+99,
                 k=self.k, k_top=self.k_top, k_gd=self.k_gd, lr=self.lr,
                 r=self.r, seed=self.seed, is_max=self.is_max)
         else:
-            protes_general(self.target, self.n, 1.E+99,
+            protes_general(self.target, self.n_inner, 1.E+99,
                 k=self.k, k_top=self.k_top, k_gd=self.k_gd, lr=self.lr,
                 r=self.r, seed=self.seed, is_max=self.is_max)
