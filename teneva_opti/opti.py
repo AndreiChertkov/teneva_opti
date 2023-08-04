@@ -55,12 +55,22 @@ class Opti:
         return ['seed', 'm']
 
     @property
+    def is_func(self):
+        """Check if the optimizer is continuous."""
+        return not self.is_tens
+
+    @property
     def is_max(self):
         return self.bm.is_opti_max
 
     @property
     def is_n_equal(self):
         return self.bm.is_n_equal
+
+    @property
+    def is_tens(self):
+        """Check if the optimizer is discrete."""
+        return not self.is_func
 
     @property
     def n(self):
@@ -96,6 +106,8 @@ class Opti:
         conf['seed'] = self.seed
         conf['name'] = self.name
         conf['machine'] = self.machine
+        conf['is_func'] = self.is_func
+        conf['is_tens'] = self.is_tens
         conf['opti'] = self.__class__.__name__
         conf['bm'] = self.bm.get_config()
         return conf
