@@ -52,6 +52,19 @@ class BmView:
         self.y_opt_list.append(bm.y_opt)
         self.t_list.append(bm.t)
 
+    def get(self, kind='mean', is_time=False):
+        if self.is_group:
+            if kind == 'best':
+                return self.t_best if is_time else self.y_opt_best
+            elif kind == 'mean':
+                return self.t_mean if is_time else self.y_opt_mean
+            elif kind == 'wrst':
+                return self.t_wrst if is_time else self.y_opt_wrst
+            else:
+                raise ValueError('Invalid kind')
+        else:
+            return self.t if is_time else self.y_opt
+
     def init_from_bm(self, bm):
         self.bm_config = bm.bm_config
         self.op_config = bm.op_config
@@ -108,6 +121,17 @@ class BmView:
 
         self.is_init = True
 
+    def is_better(self, value, kind='mean', is_time=False):
+        if value is None:
+            return True
+
+        v = self.get(kind, is_time)
+
+        if is_time:
+            return v < value
+        else:
+            return (value < v) if self.is_max else (value > v)
+
     def filter(self, d=None, n=None, bm_name=None, op_name=None, bm_seed=None):
         if d and self.d != d:
             return False
@@ -121,17 +145,17 @@ class BmView:
             return False
         return True
 
-    def info_table(self, prec=2, v_best=None):
+    def info_table(self, prec=2, value_best=None, kind='mean', is_time=False):
         form = '{:-10.' + str(prec) + 'e}'
 
-        v = self.y_opt_mean if self.is_group else self.y_opt
+        v = self.get(kind, is_time)
         v = form.format(v).strip()
 
-        if v_best is not None:
-            v_best = form.format(v_best).strip()
+        if value_best is not None:
+            value_best = form.format(value_best).strip()
 
         text = '        & '
-        if v == v_best:
+        if v == value_best:
             text += '\\fat{' + v + '}'
         else:
             text += v
