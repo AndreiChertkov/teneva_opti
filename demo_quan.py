@@ -13,7 +13,7 @@ from teneva_bm import *
 from teneva_opti import *
 
 
-def demo_quan(q=15, m=500000):
+def demo_quan(q=15, m=1.E+4):
     bm = BmHsFunc001(n=2**q)
 
     opti = OptiTensTtopt(bm, m, log_info=True)

@@ -163,6 +163,10 @@ class Opti:
         v = self.__class__.__name__
         text += f'{v}\n'
 
+        text += 'Optimization task                        : '
+        v = 'maximize' if self.is_max else 'minimize'
+        text += f'{v}\n'
+
         if footer:
             text += '-' * 41 + '|             '
             text += '>               Options'

@@ -62,15 +62,14 @@ for Bm in BMS_AGENT:
 
 
 def demo_baseline():
-    #oman = OptiManager(TASKS, fold='result_demo_baseline')
-    #oman.run()
+    oman = OptiManager(TASKS, fold='result_demo_baseline')
+    oman.run()
 
     oman = OptiManager(fold='result_demo_baseline', is_show=True)
     oman.load()
     oman.filter(d=100, bm_name='QuboKnapDet')
     oman.sort_by_op(['protes', 'ttopt'])
     oman.join_op_seed()
-
     print('\n\nLoaded result for QuboKnapDet:\n')
     oman.show_text()
 

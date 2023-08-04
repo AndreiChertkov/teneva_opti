@@ -13,7 +13,7 @@ from teneva_bm import *
 from teneva_opti import *
 
 
-def demo_quan(q=20, m=1000000):
+def demo_quan(q=20, m=1.E+6):
     bm = BmHsFunc006(n=2**q)
 
     opti = OptiTensTtopt(bm, m, log_info=True)
@@ -22,6 +22,7 @@ def demo_quan(q=20, m=1000000):
     print('\n\n')
 
     opti = OptiTensProtes(bm, m, log_info=True)
+    opti.set_opts(k=1000, k_top=10)
     opti.run()
 
 
