@@ -194,6 +194,7 @@ class Opti:
         try:
             self._optimize()
         except Exception as e:
+            # TODO: add error message into history
             self.is_fail = True
             msg = f'Optimization with "{self.name}" is failed [{e}]'
             self.log.err(msg) if with_err else self.log.wrn(msg)
