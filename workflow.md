@@ -5,7 +5,7 @@
 
 ## How to install the current local version
 
-1. Install [python](https://www.python.org) (version 3.8; you may use [anaconda](https://www.anaconda.com) package manager);
+1. Install [anaconda](https://www.anaconda.com) package manager with [python](https://www.python.org) (version 3.8);
 
 2. Create a virtual environment:
     ```bash
@@ -22,24 +22,23 @@
     pip install jupyterlab twine
     ```
 
-5. Install `teneva_opti`: from the source:
+5. Install `teneva_opti` from the source:
     ```bash
     python setup.py install
     ```
 
-6. Install `gym` and `mujoco` for `teneva_bm`:
+6. Install dependencies for all benchmarks:
     ```bash
-    wget https://raw.githubusercontent.com/AndreiChertkov/teneva_bm/main/install_mujoco.py && python install_mujoco.py --env teneva_opti && rm install_mujoco.py
+    wget https://raw.githubusercontent.com/AndreiChertkov/teneva_bm/main/install_all.py && python install_all.py --env teneva_opti && rm install_all.py
     ```
+    > In the case of problems with `scikit-learn`, uninstall it as `pip uninstall scikit-learn` and then install it from the anaconda: `conda install -c anaconda scikit-learn`.
 
-7. In the case of problems with `scikit-learn`, uninstall it `pip uninstall scikit-learn` and then install it from the anaconda: `conda install -c anaconda scikit-learn`.
-
-8. Reinstall `teneva_opti` from the source (after updates of the code):
+7. Reinstall `teneva_opti` from the source (after updates of the code):
     ```bash
     clear && pip uninstall teneva_opti -y && python setup.py install
     ```
 
-9. Optionally delete virtual environment at the end of the work:
+8. Optionally delete virtual environment at the end of the work:
     ```bash
     conda activate && conda remove --name teneva_opti --all -y
     ```
