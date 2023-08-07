@@ -6,6 +6,7 @@ class BmView:
     def __init__(self, data=None):
         self.bms = []
         self.op_seed_list = []
+        self.y_all_list = []
         self.y_opt_list = []
         self.t_list = []
         self.is_init = False
@@ -30,6 +31,21 @@ class BmView:
         return np.max(self.t_list)
 
     @property
+    def y_all_best(self):
+        y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
+        return self.values_to_one(y_lists, kind='best')
+
+    @property
+    def y_all_mean(self):
+        y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
+        return self.values_to_one(y_lists, kind='mean')
+
+    @property
+    def y_all_wrst(self):
+        y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
+        return self.values_to_one(y_lists, kind='wrst')
+
+    @property
     def y_opt_best(self):
         y = self.y_opt_list
         return np.max(y) if self.is_max else np.min(y)
@@ -49,6 +65,7 @@ class BmView:
             self.init_from_bm(bm)
 
         self.op_seed_list.append(bm.op_seed)
+        self.y_all_list.append(bm.y_list)
         self.y_opt_list.append(bm.y_opt)
         self.t_list.append(bm.t)
         if bm.is_fail:
@@ -68,6 +85,15 @@ class BmView:
                 raise ValueError('Invalid kind')
         else:
             return self.t if is_time else self.y_opt
+
+    def get_opt_str(self, opts, pretty=True):
+        res = []
+        for id, v in opts.items():
+            if isinstance(v, bool):
+                res.append(f'{id}')
+            else:
+                res.append(f'{id}: {v}' if pretty else f'{id}-{v}')
+        return ('; ' if pretty else '__').join(res)
 
     def init_from_bm(self, bm):
         self.bm_config = bm.bm_config
@@ -94,6 +120,8 @@ class BmView:
 
         self.t = bm.t
 
+        self.y_list = bm.y_list
+
         self.is_fail = True if self.op_history['err'] else False
 
         self.is_init = True
@@ -119,47 +147,27 @@ class BmView:
         self.bm_seed = self.bm_config['seed']
         self.op_seed = self.op_config['seed']
 
-        self.is_max = 'agent' in self.bm_name.lower() # TODO: fix it
+        self.is_max = self.bm_config.get('is_opti_max',
+            'agent' in self.bm_name.lower())
         self.is_min = not self.is_max
         self.y_opt = self.bm_history['y_max' if self.is_max else 'y_min']
 
         self.t = self.bm_history['time_full']
 
+        self.y_list = copy(self.bm_history['y_list'])
+
         self.is_fail = True if self.op_history['err'] else False
 
         self.is_init = True
 
-    def is_better(self, value, kind='mean', is_time=False):
-        if value is None:
-            return True
-
-        v = self.get(kind, is_time)
-        if v is None:
-            return False
-
-        if is_time:
-            return v < value
-        else:
-            return (value < v) if self.is_max else (value > v)
-
-    def filter(self, d=None, n=None, bm_name=None, op_name=None, bm_seed=None):
-        if d and self.d != d:
-            return False
-        if n and self.n != n:
-            return False
-        if bm_name and self.bm_name != bm_name:
-            return False
-        if op_name and self.op_name != op_name:
-            return False
-        if bm_seed and self.bm_seed != bm_seed:
-            return False
-        return True
-
-    def info_table(self, prec=2, value_best=None, kind='mean', is_time=False):
+    def info_table(self, prec=2, value_best=None, kind='mean', is_time=False,
+                   prefix='        & ', fail='FAIL', best_cmd='fat',
+                   postfix='', prefix_comment_inner='%       > ',
+                   with_comment=True):
         form = '{:-10.' + str(prec) + 'e}'
 
         if self.is_fail:
-            v = 'FAIL'
+            v = fail
         else:
             v = self.get(kind, is_time)
             v = form.format(v).strip()
@@ -167,32 +175,27 @@ class BmView:
         if value_best is not None:
             value_best = form.format(value_best).strip()
 
-        text = '        & '
-        if v == value_best:
-            text += '\\fat{' + v + '}'
+        text = ''
+
+        if with_comment:
+            text += prefix_comment_inner
+            text += self.info_text_bm(with_prefix=False) + '\n'
+            text += prefix_comment_inner
+            text += self.info_text_op(with_prefix=False) + '\n'
+
+        text += prefix
+
+        if v == value_best and best_cmd:
+            text += '\\' + best_cmd + '{'+ v + '}'
         else:
             text += v
 
-        return text
+        return text + postfix
 
     def info_text(self, len_max=21):
         text = ''
-
-        name = self.bm_name[:(len_max-1)]
-        pref = '- BM      > ' if self.is_group else '- BM   > '
-        text += '\n'
-        text += pref + name + ' '*(len_max-len(name))
-        text += ' [' + self.get_opt_str(self.bm_opts, pretty=True) + ']'
-
-        name = self.op_name[:(len_max-1)]
-        pref = '- OPTI    > ' if self.is_group else '- OPTI > '
-        opts = self.op_opts
-        if self.is_group:
-            opts['SEEDS'] = len(self.op_seed_list)
-            del opts['seed']
-        text += '\n'
-        text += pref + name + ' '*(len_max-len(name))
-        text += ' [' + self.get_opt_str(opts, pretty=True) + ']'
+        text += '\n' + self.info_text_bm(len_max)
+        text += '\n' + self.info_text_op(len_max)
 
         task = 'max' if self.is_max else 'min'
 
@@ -225,6 +228,46 @@ class BmView:
                 text += f'[time: {self.t:-8.1e}]'
 
         return text
+
+    def info_text_bm(self, len_max=21, with_prefix=True):
+        text = ''
+        name = self.bm_name[:(len_max-1)]
+        if with_prefix:
+            pref = '- BM      > ' if self.is_group else '- BM   > '
+        else:
+            pref = ''
+        opts = copy(self.bm_opts)
+        text += pref + name + ' ' * max(0, len_max-len(name))
+        text += ' [' + self.get_opt_str(opts, pretty=True) + ']'
+        return text
+
+    def info_text_op(self, len_max=21, with_prefix=True):
+        text = ''
+        name = self.op_name[:(len_max-1)]
+        if with_prefix:
+            pref = '- OPTI    > ' if self.is_group else '- OPTI > '
+        else:
+            pref = ''
+        opts = copy(self.op_opts)
+        if self.is_group:
+            opts['SEEDS'] = len(self.op_seed_list)
+            del opts['seed']
+        text += pref + name + ' ' * max(0, len_max-len(name))
+        text += ' [' + self.get_opt_str(opts, pretty=True) + ']'
+        return text
+
+    def is_better(self, value, kind='mean', is_time=False):
+        if value is None:
+            return True
+
+        v = self.get(kind, is_time)
+        if v is None:
+            return False
+
+        if is_time:
+            return v < value
+        else:
+            return (value < v) if self.is_max else (value > v)
 
     def is_same(self, bm, skip_op_seed=True):
         if not self.is_init:
@@ -269,11 +312,33 @@ class BmView:
 
         return True
 
-    def get_opt_str(self, opts, pretty=True):
+    def values_to_one(self, y_lists, kind='mean'):
         res = []
-        for id, v in opts.items():
-            if isinstance(v, bool):
-                res.append(f'{id}')
+        lens = [len(y_list) for y_list in y_lists]
+        for k in range(max(lens)):
+            vals = []
+            for y_list in y_lists:
+                l = len(y_list)
+                vals.append(y_list[k] if l > k else y_list[l-1])
+            if kind == 'best':
+                res.append(np.max(vals))
+            elif kind == 'mean':
+                res.append(np.mean(vals))
+            elif kind == 'wrst':
+                res.append(np.min(vals))
             else:
-                res.append(f'{id}: {v}' if pretty else f'{id}-{v}')
-        return ('; ' if pretty else '__').join(res)
+                raise ValueError('Invalid kind')
+        return res
+
+    def values_to_opt(self, y_list):
+        res = []
+        opt = None
+        for k, v in enumerate(y_list):
+            if opt is None:
+                opt = v
+            elif self.is_max and v > opt:
+                opt = v
+            elif self.is_min and v < opt:
+                opt = v
+            res.append(opt)
+        return res

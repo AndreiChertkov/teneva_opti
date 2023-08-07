@@ -3,6 +3,7 @@ import os
 
 
 from .bm_view import BmView
+from .plot import plot_deps
 from .utils import Log
 from .utils import get_identity_str
 from .utils import path
@@ -30,12 +31,47 @@ class OptiManager:
         args['machine'] = args.get('machine', self.machine)
         return args
 
-    def filter(self, d=None, n=None, bm_name=None, op_name=None, bm_seed=None):
+    def check_table(self):
+        bm_names = []
+        for bm in self.bms:
+            bm_names.append(bm.bm_name)
+        bm_names = list(set(bm_names))
+        if len(bm_names) > 1:
+            raise ValueError(f'Invalid (more than 1 bm name for table)')
+        bm_name = bm_names[0]
+
+        ops = {}
+        for bm in self.bms:
+            ops[bm.op_name] = ops.get(bm.op_name, 0) + 1
+        for name, count in ops.items():
+            if count > 1:
+                raise ValueError(f'Invalid for opti "{name}" (repeated)')
+
+    def filter(self, arg='name', value=None, is_op=False):
+        if value is None:
+            return
+
         bms = []
         for bm in self.bms:
-            if bm.filter(d, n, bm_name, op_name, bm_seed):
+            config = getattr(bm, 'op_config' if is_op else 'bm_config', {})
+            value_ref = config.get(arg)
+            if value == value_ref:
                 bms.append(bm)
+
         self.bms = bms
+
+    def filter_by_bm(self, arg='name', value=None):
+        self.filter(arg, value, is_op=False)
+
+    def filter_by_op(self, arg='name', value=None):
+        self.filter(arg, value, is_op=True)
+
+    def get_best(self, kind, is_time):
+        value_best = None
+        for bm in self.bms:
+            if bm.is_better(value_best, kind, is_time):
+                value_best = bm.get(kind, is_time)
+        return value_best
 
     def info(self, bm, opti, len_max=21):
         text = ''
@@ -64,7 +100,7 @@ class OptiManager:
 
         return text
 
-    def join_op_seed(self):
+    def join_by_op_seed(self):
         bms = []
         for bm in self.bms:
             is_found = False
@@ -125,9 +161,15 @@ class OptiManager:
             fold3 = os.path.join(fold2, 'data')
             for bm_opts_str in os.listdir(fold3):
                 fold4 = os.path.join(fold3, bm_opts_str)
+                if os.path.isfile(fold4):
+                    continue
                 for op_opts_str in os.listdir(fold4):
                     fold5 = os.path.join(fold4, op_opts_str)
+                    if os.path.isfile(fold5):
+                        continue
                     for op_file in os.listdir(fold5):
+                        if not '.npz' in op_file:
+                            continue
                         op_name = op_file.split('.npz')[0]
                         op_path = os.path.join(fold5, op_file)
                         data = np.load(op_path, allow_pickle=True)
@@ -138,6 +180,27 @@ class OptiManager:
                         data['op_name'] = op_name
                         check(data)
                         self.bms.append(BmView(data))
+
+    def plot(self, fpath=None, name_map=None, name_spec=None, colors=None):
+        self.check_table()
+
+        if colors is None:
+            colors = [
+                '#000099', '#003300', '#FFF800', '#FFB300', '#CE0071',
+                '#333300', '#66ffcc', '#ff9999', '#cc0000', '#6699ff',
+                '#804000', '#cc6699', '#00B454', '#ff66ff', '#558000']
+
+        data = {}
+        for bm in self.bms:
+            name = name_map[bm.op_name] if name_map else bm.op_name
+            #print(name, len(bm.y_all_mean))
+            data[name] = {
+                'best': bm.y_all_best,
+                'mean': bm.y_all_mean,
+                'wrst': bm.y_all_wrst,
+                'skip': bm.is_fail}
+
+        plot_deps(data, colors, path(fpath, 'png'), name_spec)
 
     def run(self):
         for task in self.tasks:
@@ -170,42 +233,38 @@ class OptiManager:
                 opti.render(with_wrn=False)
                 opti.show(with_wrn=False)
 
-    def show_table(self, prefix='', prec=2, kind='mean', is_time=False):
-        bm_names = []
-        for bm in self.bms:
-            bm_names.append(bm.bm_name)
-        bm_names = list(set(bm_names))
-        if len(bm_names) > 1:
-            raise ValueError(f'Invalid (more than 1 bm)')
-        bm_name = bm_names[0]
-
-        ops = {}
-        for bm in self.bms:
-            ops[bm.op_name] = ops.get(bm.op_name, 0) + 1
-        for name, count in ops.items():
-            if count > 1:
-                raise ValueError(f'Invalid for opti "{name}" (repeated)')
-
-        value_best = None
-        for bm in self.bms:
-            if bm.is_better(value_best, kind, is_time):
-                value_best = bm.get(kind, is_time)
+    def show_table(self, prefix='', postfix='', prec=2, kind='mean',
+                   is_time=False, prefix_inner='        & ', fail='FAIL',
+                   best_cmd='fat', postfix_inner='',
+                   prefix_comment_inner='%       > ', with_comment=True):
+        self.check_table()
+        value_best = self.get_best(kind, is_time)
 
         if prefix:
             self.log(prefix)
         for bm in self.bms:
-            self.log(bm.info_table(prec, value_best, kind, is_time))
+            self.log(bm.info_table(prec, value_best, kind, is_time,
+                prefix_inner, fail, best_cmd, postfix_inner,
+                prefix_comment_inner, with_comment))
+        if postfix:
+            self.log(postfix)
 
     def show_text(self):
         for bm in self.bms:
             self.log(bm.info_text())
 
-    def sort_by_bm(self, names):
-        def ind(name):
-            return names.index(name) if name in names else len(names)
-        self.bms = sorted(self.bms, key=lambda bm: ind(bm.bm_name))
+    def sort(self, arg='name', values=None, is_op=False):
+        def sort(bm):
+            config = getattr(bm, 'op_config' if is_op else 'bm_config', {})
+            value = config.get(arg)
+            if values is None:
+                return value
+            else:
+                return values.index(value) if value in values else len(values)
+        self.bms = sorted(self.bms, key=lambda bm: sort(bm))
 
-    def sort_by_op(self, names):
-        def ind(name):
-            return names.index(name) if name in names else len(names)
-        self.bms = sorted(self.bms, key=lambda bm: ind(bm.op_name))
+    def sort_by_bm(self, arg='name', values=None):
+        self.sort(arg, values, is_op=False)
+
+    def sort_by_op(self, arg='name', values=None):
+        self.sort(arg, values, is_op=True)
