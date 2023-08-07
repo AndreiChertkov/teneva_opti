@@ -3,5 +3,5 @@ nevergrad==0.11.0
 protes==0.3.4
 seaborn>=0.12.2
 teneva>=0.14.5
-teneva_bm==0.7.3
+teneva_bm==0.7.4
 ttopt==0.6.2
