@@ -18,7 +18,7 @@ class OptiManager:
 
         fname = 'log_manager_show' if self.is_show else 'log_manager'
         fpath = os.path.join(self.fold, fname)
-        self.log = Log(fpath)
+        self.log = Log(fpath, is_file_add=is_show)
 
         self.bms = []
 
@@ -156,7 +156,7 @@ class OptiManager:
         fold1 = self.fold
         for bm_name in os.listdir(fold1):
             fold2 = os.path.join(fold1, bm_name)
-            if os.path.isfile(fold2):
+            if  bm_name[0] == '_' or os.path.isfile(fold2):
                 continue
             fold3 = os.path.join(fold2, 'data')
             for bm_opts_str in os.listdir(fold3):
@@ -180,27 +180,6 @@ class OptiManager:
                         data['op_name'] = op_name
                         check(data)
                         self.bms.append(BmView(data))
-
-    def plot(self, fpath=None, name_map=None, name_spec=None, colors=None):
-        self.check_table()
-
-        if colors is None:
-            colors = [
-                '#000099', '#003300', '#FFF800', '#FFB300', '#CE0071',
-                '#333300', '#66ffcc', '#ff9999', '#cc0000', '#6699ff',
-                '#804000', '#cc6699', '#00B454', '#ff66ff', '#558000']
-
-        data = {}
-        for bm in self.bms:
-            name = name_map[bm.op_name] if name_map else bm.op_name
-            #print(name, len(bm.y_all_mean))
-            data[name] = {
-                'best': bm.y_all_best,
-                'mean': bm.y_all_mean,
-                'wrst': bm.y_all_wrst,
-                'skip': bm.is_fail}
-
-        plot_deps(data, colors, path(fpath, 'png'), name_spec)
 
     def run(self):
         for task in self.tasks:
@@ -233,10 +212,34 @@ class OptiManager:
                 opti.render(with_wrn=False)
                 opti.show(with_wrn=False)
 
+    def show_plot(self, fpath=None, name_map=None, name_spec=None, colors=None,
+                  scale=1., lim_x=None, lim_y=None):
+        """This is draft!!!"""
+        self.check_table()
+
+        if colors is None:
+            colors = [
+                '#000099', '#FFB300', '#00B454', '#cc0000', '#cc6699',
+                '#804000', '#ff66ff', '#333300',
+                '#003300', '#FFF800', '#CE0071', '#333300', '#66ffcc',
+                '#ff9999', '#6699ff', '#804000', '#558000']
+
+        data = {}
+        for bm in self.bms:
+            name = name_map[bm.op_name] if name_map else bm.op_name
+            data[name] = {
+                'best': np.array(bm.y_all_best) / scale,
+                'mean': np.array(bm.y_all_mean) / scale,
+                'wrst': np.array(bm.y_all_wrst) / scale,
+                'skip': bm.is_fail}
+
+        plot_deps(data, colors, path(fpath, 'png'), name_spec,
+            lim_x=lim_x, lim_y=lim_y)
+
     def show_table(self, prefix='', postfix='', prec=2, kind='mean',
                    is_time=False, prefix_inner='        & ', fail='FAIL',
                    best_cmd='fat', postfix_inner='',
-                   prefix_comment_inner='%       > ', with_comment=True):
+                   prefix_comment_inner='%       > ', with_comment=False):
         self.check_table()
         value_best = self.get_best(kind, is_time)
 
@@ -249,9 +252,9 @@ class OptiManager:
         if postfix:
             self.log(postfix)
 
-    def show_text(self):
+    def show_text(self, prec=5, prec_time=1):
         for bm in self.bms:
-            self.log(bm.info_text())
+            self.log(bm.info_text(prec, prec_time))
 
     def sort(self, arg='name', values=None, is_op=False):
         def sort(bm):

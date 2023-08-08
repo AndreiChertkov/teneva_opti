@@ -163,7 +163,7 @@ class BmView:
     def info_table(self, prec=2, value_best=None, kind='mean', is_time=False,
                    prefix='        & ', fail='FAIL', best_cmd='fat',
                    postfix='', prefix_comment_inner='%       > ',
-                   with_comment=True):
+                   with_comment=False):
         form = '{:-10.' + str(prec) + 'e}'
 
         if self.is_fail:
@@ -192,12 +192,15 @@ class BmView:
 
         return text + postfix
 
-    def info_text(self, len_max=21):
+    def info_text(self, prec=5, prec_time=1, len_max=21):
         text = ''
         text += '\n' + self.info_text_bm(len_max)
         text += '\n' + self.info_text_op(len_max)
 
         task = 'max' if self.is_max else 'min'
+
+        form = '{:-14.' + str(prec) + 'e}'
+        form_time = '{:-.' + str(prec_time) + 'e}'
 
         if self.is_group:
             if self.is_fail:
@@ -205,18 +208,24 @@ class BmView:
             else:
                 text += '\n'
                 text += '  > BEST >> '
-                text += f'{task}: {self.y_opt_best:-14.5e}   '
-                text += f'[time: {self.t_best:-8.1e}]'
+                v = form.format(self.y_opt_best)
+                text += f'{task}: {v}   '
+                v = form_time.format(self.t_best)
+                text += f'[time: {v}]'
 
                 text += '\n'
                 text += '  > MEAN >> '
-                text += f'{task}: {self.y_opt_mean:-14.5e}   '
-                text += f'[time: {self.t_mean:-8.1e}]'
+                v = form.format(self.y_opt_mean)
+                text += f'{task}: {v}   '
+                v = form_time.format(self.t_mean)
+                text += f'[time: {v}]'
 
                 text += '\n'
                 text += '  > WRST >> '
-                text += f'{task}: {self.y_opt_wrst:-14.5e}   '
-                text += f'[time: {self.t_wrst:-8.1e}]'
+                v = form.format(self.y_opt_wrst)
+                text += f'{task}: {v}   '
+                v = form_time.format(self.t_wrst)
+                text += f'[time: {v}]'
 
         else:
             text += '\n'
@@ -224,8 +233,10 @@ class BmView:
             if self.is_fail:
                 text += ' ***FAIL***'
             else:
-                text += f'{task}: {self.y_opt:-14.5e}   '
-                text += f'[time: {self.t:-8.1e}]'
+                v = form.format(self.y_opt)
+                text += f'{task}: {v}   '
+                v = form_time.format(self.t)
+                text += f'[time: {v}]'
 
         return text
 
@@ -314,8 +325,9 @@ class BmView:
 
     def values_to_one(self, y_lists, kind='mean'):
         res = []
-        lens = [len(y_list) for y_list in y_lists]
-        for k in range(max(lens)):
+        # lens = [len(y_list) for y_list in y_lists]
+        # for k in range(max(lens)):
+        for k in range(self.bm_config['budget_m']):
             vals = []
             for y_list in y_lists:
                 l = len(y_list)

@@ -24,7 +24,9 @@ sns.mpl.rcParams['legend.frameon'] = 'False'
 
 
 def plot_deps(data, colors, fpath=None, name_spec=None,
-              xlabel='Number of requests', ylabel=None, title=None):
+              xlabel='Number of requests', ylabel=None, title=None,
+              lim_x=None, lim_y=None):
+    """This is draft!!!"""
     fig, ax = plt.subplots(1, 1, figsize=(8, 8))
     plt.subplots_adjust(wspace=0.)
 
@@ -43,15 +45,17 @@ def plot_deps(data, colors, fpath=None, name_spec=None,
         y_best = np.array(item['best'])
         y_wrst = np.array(item['wrst'])
         x = np.arange(len(y))
-        linewidth = 3 if name_spec == name else 2
+        linewidth = 1 if name_spec == name else 1
         ax.plot(x, y, label=name, color=colors[i],
-            marker='o', markersize=4, linewidth=linewidth)
+            marker='o', markersize=0, linewidth=linewidth)
 
-        ax.fill_between(x, y_wrst, y_best, alpha=0.5, color=colors[i])
+        ax.fill_between(x, y_wrst, y_best, alpha=0.4, color=colors[i])
 
     _prep_ax(ax, xlog=True, ylog=False, leg=True)
-    # ax.set_xlim(m_min, 2.E+4)
-    # ax.set_ylim(plot_opts[bm]['y_min'], plot_opts[bm]['y_max'])
+    if lim_x is not None:
+        ax.set_xlim(*lim_x)
+    if lim_y is not None:
+        ax.set_ylim(*lim_y)
 
     #yticks = [1.8E+3, 2.0E+3, 2.2E+3, 2.4E+3, 2.6E+3, 2.8E+3, 3.0E+3, 3.2E+3]
     #ax.set(yticks=yticks, yticklabels=[int(])
@@ -71,7 +75,7 @@ def _prep_ax(ax, xlog=False, ylog=False, leg=False, xint=False, xticks=None):
         ax.set_yscale('symlog')
 
     if leg:
-        ax.legend(loc='upper right', frameon=True)
+        ax.legend(loc='upper left', frameon=True)
 
     ax.grid(ls=":")
 
