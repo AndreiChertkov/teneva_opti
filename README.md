@@ -10,7 +10,7 @@ Collection of various optimization methods (search for the global minimum and/or
 
 1. The package can be installed via pip (it requires the [Python](https://www.python.org) programming language of the version 3.8 or 3.9):
     ```bash
-    pip install teneva_opti==0.3.6
+    pip install teneva_opti==0.3.7
     ```
     > The package can be also downloaded from the repository [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) and be installed by `python setup.py install` command from the root folder of the project.
 
