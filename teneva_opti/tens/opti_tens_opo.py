@@ -5,8 +5,18 @@ from teneva_opti import OptiTens
 
 
 DESC = """
-    The OnePlusOne optimizer. See the repo nevergrad:
-    https://github.com/facebookresearch/nevergrad
+    One-Plus-One (OPO).
+    We use the implementation from the nevergrad (v. 0.8.0) package [1]
+    with default parameters.
+
+    The OPO method is based on a simple stochastic approach using at each
+    step a random mutation of the current candidate for the optimum, while
+    on average only one index of the multi-index changes at each step.
+
+    Links:
+    [1] https://github.com/facebookresearch/nevergrad/blob/
+    7d1e2d2a15b89130206f28d86f5de2bf321d0636/nevergrad/optimization/
+    optimizerlib.py#L401
 """
 
 
