@@ -4,6 +4,8 @@ import numpy as np
 
 class BmView:
     def __init__(self, data=None):
+        raise NotImplementedError('Will be updated soon.')
+        
         self.bms = []
         self.op_seed_list = []
         self.y_all_list = []

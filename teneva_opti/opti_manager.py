@@ -11,6 +11,8 @@ from .utils import path
 
 class OptiManager:
     def __init__(self, tasks=[], fold='result', machine='', is_show=False):
+        raise NotImplementedError('Will be updated soon.')
+        
         self.tasks = tasks
         self.fold = fold
         self.machine = machine
