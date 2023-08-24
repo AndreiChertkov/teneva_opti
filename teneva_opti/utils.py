@@ -8,8 +8,8 @@ class Log:
         self.fpath = path(fpath, 'txt')
         self.with_log = with_log
         self.with_log_info = with_log_info
-        self.is_file_new = True
         self.is_file_add = is_file_add
+        self.is_file_new = True
 
     def __call__(self, text):
         if self.with_log:
