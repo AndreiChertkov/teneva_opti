@@ -1,30 +1,9 @@
+"""Basic examples for manager usage."""
 from teneva_bm import *
 from teneva_opti import *
 
 
-TASKS = []
-
-
-BM_M = 1.E+2
-
-
-BM_AGENT_STEPS = 250
-BM_AGENT_M = 1.E+2
-
-
-BM_OPTI_SEEDS = [0, 1]
-
-
-OPTIS = [
-    OptiTensProtes,
-    OptiTensOptimatt,
-    OptiTensTtopt,
-    OptiTensOpo,
-    OptiTensPso,
-    OptiTensNb,
-    OptiTensSpsa,
-    OptiTensPortfolio,
-][:3]
+OPTIS = [OptiTensProtes, OptiTensTtopt, OptiTensPortfolio]
 
 
 BMS_AGENT = [
@@ -37,40 +16,39 @@ BMS_AGENT = [
 ]
 
 
-SEEDS = [0, 1]
+TASKS = []
 
 
-for d in [10, 20, 50, 80, 100]:
-    for Opti in OPTIS:
-        for seed in SEEDS:
-            TASKS.append({
-                'bm': BmQuboKnapDet,
-                'bm_args': {'d': d},
-                'opti': Opti,
-                'opti_args': {'m': BM_M, 'seed': seed},
-            })
+for Opti in OPTIS:
+    for seed in [0, 1]:
+        TASKS.append({
+            'bm': BmQuboMvc,
+            'bm_args': {'d': 55, 'pcon': 3, 'seed': 99},
+            'opti': Opti,
+            'opti_args': {'m': 1.E+2, 'seed': seed},
+        })
 
 
 for Bm in BMS_AGENT:
     for Opti in OPTIS:
         TASKS.append({
             'bm': Bm,
-            'bm_args': {'steps': BM_AGENT_STEPS},
+            'bm_args': {'steps': 250},
             'opti': Opti,
-            'opti_args': {'m': BM_AGENT_M},
+            'opti_args': {'m': 1.E+2, 'seed': 12345},
         })
 
 
-def demo_baseline():
+def demo():
     oman = OptiManager(TASKS, fold='result_demo_baseline')
     oman.run()
 
     oman = OptiManager(fold='result_demo_baseline', is_show=True)
     oman.load()
-    oman.filter(d=100, bm_name='QuboKnapDet')
-    oman.sort_by_op(['protes', 'ttopt'])
+    oman.filter(d=100, bm_name='QuboKnapMvc')
+    oman.sort_by_op(['protes', 'ttopt', 'portfolio'])
     oman.join_op_seed()
-    print('\n\nLoaded result for QuboKnapDet:\n')
+    print('\n\nLoaded result for QuboKnapMvc:\n')
     oman.show_text()
 
     oman.show_table('\n\nTable for mean:')
@@ -81,5 +59,6 @@ def demo_baseline():
     oman.show_table('\n\nTable for best time:', kind='best', is_time=True)
     oman.show_table('\n\nTable for wrst time:', kind='wrst', is_time=True)
 
+
 if __name__ == '__main__':
-    demo_baseline()
+    demo()
