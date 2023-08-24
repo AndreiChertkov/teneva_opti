@@ -14,7 +14,7 @@ Collection of various optimization methods (search for the global minimum and/or
     ```
     > The package can be also downloaded from the repository [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) and be installed by `python setup.py install` command from the root folder of the project.
 
-2. We test optimizers with benchmarks from [teneva_bm](https://github.com/AndreiChertkov/teneva_bm) library. For installation of additional dependencies (`gym`, `mujoco`, etc.), please, do the following (for existing conda environment `teneva_opti`; if you are using a different environment name, then please make the appropriate substitution in the script):
+2. We test optimizers with benchmarks from [teneva_bm](https://github.com/AndreiChertkov/teneva_bm) library. For installation of additional dependencies (`gym`, `mujoco`, etc.), please, do the following (for existing conda environment `teneva_opti`; if you are using a different environment name, then please make the appropriate substitution in the script; note that you don't need to use environment in colab):
     ```bash
     wget https://raw.githubusercontent.com/AndreiChertkov/teneva_bm/main/install_all.py && python install_all.py --env teneva_opti && rm install_all.py
     ```
@@ -25,10 +25,10 @@ Collection of various optimization methods (search for the global minimum and/or
 
 Please, run the demo script from the root of the [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) repository:
 ```bash
-clear && python demo.py
+clear && python demo/base.py
 ```
 
-> See also other `demo_*.py` scripts in the root of the [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) repository.
+> See also other demo` scripts in the folder `demo` of the [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) repository.
 
 
 ## Authors
