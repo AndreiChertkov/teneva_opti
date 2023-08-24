@@ -33,7 +33,7 @@ class BmView:
     @property
     def y_all_best(self):
         if not self.is_group:
-            return self.y_list
+            return self.values_to_opt(self.y_list)
 
         y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
         return self.values_to_one(y_lists, kind='best')
@@ -41,7 +41,7 @@ class BmView:
     @property
     def y_all_mean(self):
         if not self.is_group:
-            return self.y_list
+            return self.values_to_opt(self.y_list)
 
         y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
         return self.values_to_one(y_lists, kind='mean')
@@ -49,7 +49,7 @@ class BmView:
     @property
     def y_all_wrst(self):
         if not self.is_group:
-            return self.y_list
+            return self.values_to_opt(self.y_list)
 
         y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
         return self.values_to_one(y_lists, kind='wrst')
