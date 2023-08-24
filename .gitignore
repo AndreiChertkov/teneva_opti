@@ -11,7 +11,6 @@ build/
 dist/
 _tmp/
 result/
-result_baseline/
 result_demo/
-result_demo_baseline/
+result_demo_manager/
 result_test/

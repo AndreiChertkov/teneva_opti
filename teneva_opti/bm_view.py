@@ -4,8 +4,6 @@ import numpy as np
 
 class BmView:
     def __init__(self, data=None):
-        raise NotImplementedError('Will be updated soon.')
-        
         self.bms = []
         self.op_seed_list = []
         self.y_all_list = []
@@ -34,16 +32,25 @@ class BmView:
 
     @property
     def y_all_best(self):
+        if not self.is_group:
+            return self.y_list
+
         y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
         return self.values_to_one(y_lists, kind='best')
 
     @property
     def y_all_mean(self):
+        if not self.is_group:
+            return self.y_list
+
         y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
         return self.values_to_one(y_lists, kind='mean')
 
     @property
     def y_all_wrst(self):
+        if not self.is_group:
+            return self.y_list
+
         y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
         return self.values_to_one(y_lists, kind='wrst')
 
@@ -91,21 +98,26 @@ class BmView:
     def get_opt_str(self, opts, pretty=True):
         res = []
         for id, v in opts.items():
-            if isinstance(v, bool):
+            if v is None or v == '' or v is False:
+                continue
+            elif isinstance(v, bool):
                 res.append(f'{id}')
             else:
                 res.append(f'{id}: {v}' if pretty else f'{id}-{v}')
         return ('; ' if pretty else '__').join(res)
 
     def init_from_bm(self, bm):
-        self.bm_config = bm.bm_config
-        self.op_config = bm.op_config
-
-        self.bm_history = bm.bm_history
-        self.op_history = bm.op_history
+        self.bm_args = bm.bm_args
+        self.op_args = bm.op_args
 
         self.bm_opts = bm.bm_opts
         self.op_opts = bm.op_opts
+
+        self.bm_prps = bm.bm_prps
+        self.op_prps = bm.op_prps
+
+        self.bm_hist = bm.bm_hist
+        self.op_hist = bm.op_hist
 
         self.d = bm.d
         self.n = bm.n
@@ -118,47 +130,51 @@ class BmView:
 
         self.is_max = bm.is_max
         self.is_min = bm.is_min
+
         self.y_opt = bm.y_opt
 
         self.t = bm.t
 
         self.y_list = bm.y_list
+        self.y_list_full = bm.y_list_full
 
-        self.is_fail = True if self.op_history['err'] else False
+        self.is_fail = bm.is_fail
 
         self.is_init = True
 
     def init_from_data(self, data):
-        self.bm_config = copy(data['config']['bm'])
-        self.op_config = copy(data['config'])
-        del self.op_config['bm']
+        self.bm_args = copy(data['bm']['args'])
+        self.op_args = copy(data['args'])
 
-        self.bm_history = copy(data['history']['bm'])
-        self.op_history = copy(data['history'])
-        del self.op_history['bm']
+        self.bm_opts = copy(data['bm']['opts'])
+        self.op_opts = copy(data['opts'])
 
-        self.bm_opts = copy(data['bm_opts'])
-        self.op_opts = copy(data['op_opts'])
+        self.bm_prps = copy(data['bm']['prps'])
+        self.op_prps = copy(data['prps'])
 
-        self.d = self.bm_config['d']
-        self.n = self.bm_config['n']
+        self.bm_hist = copy(data['bm']['hist'])
+        self.op_hist = copy(data['hist'])
 
-        self.bm_name = self.bm_config['name']
-        self.op_name = self.op_config['name']
+        self.d = self.bm_args['d']
+        self.n = self.bm_args['n']
 
-        self.bm_seed = self.bm_config['seed']
-        self.op_seed = self.op_config['seed']
+        self.bm_name = self.bm_prps['name']
+        self.op_name = self.op_prps['name']
 
-        self.is_max = self.bm_config.get('is_opti_max',
-            'agent' in self.bm_name.lower())
-        self.is_min = not self.is_max
-        self.y_opt = self.bm_history['y_max' if self.is_max else 'y_min']
+        self.bm_seed = self.bm_args['seed']
+        self.op_seed = self.op_args['seed']
 
-        self.t = self.bm_history['time_full']
+        self.is_max = self.bm_prps['is_opti_max']
+        self.is_min = self.bm_prps['is_opti_min']
 
-        self.y_list = copy(self.bm_history['y_list'])
+        self.y_opt = self.bm_hist['y_max' if self.is_max else 'y_min']
 
-        self.is_fail = True if self.op_history['err'] else False
+        self.t = self.bm_hist['time_full']
+
+        self.y_list = copy(self.bm_hist['y_list'])
+        self.y_list_full = copy(self.bm_hist['y_list_full'])
+
+        self.is_fail = True if self.op_hist['err'] else False
 
         self.is_init = True
 
@@ -249,9 +265,9 @@ class BmView:
             pref = '- BM      > ' if self.is_group else '- BM   > '
         else:
             pref = ''
-        opts = copy(self.bm_opts)
+        args = copy(self.bm_args)
         text += pref + name + ' ' * max(0, len_max-len(name))
-        text += ' [' + self.get_opt_str(opts, pretty=True) + ']'
+        text += ' [' + self.get_opt_str(args, pretty=True) + ']'
         return text
 
     def info_text_op(self, len_max=21, with_prefix=True):
@@ -261,12 +277,15 @@ class BmView:
             pref = '- OPTI    > ' if self.is_group else '- OPTI > '
         else:
             pref = ''
-        opts = copy(self.op_opts)
+        args = copy(self.op_args)
+        del args['fold']
+        del args['machine']
+        del args['with_cache']
         if self.is_group:
-            opts['SEEDS'] = len(self.op_seed_list)
-            del opts['seed']
+            args['SEEDS'] = len(self.op_seed_list)
+            del args['seed']
         text += pref + name + ' ' * max(0, len_max-len(name))
-        text += ' [' + self.get_opt_str(opts, pretty=True) + ']'
+        text += ' [' + self.get_opt_str(args, pretty=True) + ']'
         return text
 
     def is_better(self, value, kind='mean', is_time=False):
@@ -295,32 +314,32 @@ class BmView:
         if bm1.op_name !=bm2.op_name:
             return False
 
-        for id in bm1.bm_opts.keys():
-            if not id in bm2.bm_opts:
+        for id in bm1.bm_args.keys():
+            if not id in bm2.bm_args:
                 return False
-            if bm1.bm_opts[id] != bm2.bm_opts[id]:
-                return False
-
-        for id in bm2.bm_opts.keys():
-            if not id in bm1.bm_opts:
-                return False
-            if bm1.bm_opts[id] != bm2.bm_opts[id]:
+            if bm1.bm_args[id] != bm2.bm_args[id]:
                 return False
 
-        for id in bm1.op_opts.keys():
+        for id in bm2.bm_args.keys():
+            if not id in bm1.bm_args:
+                return False
+            if bm1.bm_args[id] != bm2.bm_args[id]:
+                return False
+
+        for id in bm1.op_args.keys():
             if id == 'seed' and skip_op_seed:
                 continue
-            if not id in bm2.op_opts:
+            if not id in bm2.op_args:
                 return False
-            if bm1.op_opts[id] != bm2.op_opts[id]:
+            if bm1.op_args[id] != bm2.op_args[id]:
                 return False
 
-        for id in bm2.op_opts.keys():
+        for id in bm2.op_args.keys():
             if id == 'seed' and skip_op_seed:
                 continue
-            if not id in bm1.op_opts:
+            if not id in bm1.op_args:
                 return False
-            if bm1.op_opts[id] != bm2.op_opts[id]:
+            if bm1.op_args[id] != bm2.op_args[id]:
                 return False
 
         return True
@@ -329,7 +348,7 @@ class BmView:
         res = []
         # lens = [len(y_list) for y_list in y_lists]
         # for k in range(max(lens)):
-        for k in range(self.bm_config['budget_m']):
+        for k in range(self.bm_prps['budget_m']):
             vals = []
             for y_list in y_lists:
                 l = len(y_list)

@@ -10,19 +10,19 @@ from .utils import path
 
 
 class OptiManager:
-    def __init__(self, tasks=[], fold='result', machine='', is_show=False):
-        raise NotImplementedError('Will be updated soon.')
-        
+    def __init__(self, tasks=[], fold='result', machine='', load=False):
         self.tasks = tasks
         self.fold = fold
         self.machine = machine
-        self.is_show = is_show
 
-        fname = 'log_manager_show' if self.is_show else 'log_manager'
+        fname = 'log_manager_process' if load else 'log_manager'
         fpath = os.path.join(self.fold, fname)
-        self.log = Log(fpath, is_file_add=is_show)
+        self.log = Log(fpath, is_file_add=load)
 
         self.bms = []
+
+        if load:
+            self.load()
 
     def build_args(self, args, bm):
         args['bm'] = args.get('bm', bm)
@@ -33,7 +33,7 @@ class OptiManager:
         args['machine'] = args.get('machine', self.machine)
         return args
 
-    def check_table(self):
+    def check_group_for_show(self):
         bm_names = []
         for bm in self.bms:
             bm_names.append(bm.bm_name)
@@ -55,8 +55,11 @@ class OptiManager:
 
         bms = []
         for bm in self.bms:
-            config = getattr(bm, 'op_config' if is_op else 'bm_config', {})
-            value_ref = config.get(arg)
+            if arg == 'name': # TODO
+                args = getattr(bm, 'op_prps' if is_op else 'bm_prps', {})
+            else:
+                args = getattr(bm, 'op_args' if is_op else 'bm_args', {})
+            value_ref = args.get(arg)
             if value == value_ref:
                 bms.append(bm)
 
@@ -93,7 +96,7 @@ class OptiManager:
     def info_history(self, opti, len_max=27):
         text = '  >>>>>> '
 
-        if opti.is_fail:
+        if opti.err:
             text += f'FAIL'
         else:
             task = 'max' if opti.is_max else 'min'
@@ -137,22 +140,22 @@ class OptiManager:
             return opts
 
         def check(data):
-            if data['bm_name'] != data['config']['bm']['name']:
+            if data['bm_name'] != data['bm']['prps']['name']:
                 raise ValueError('Invalid data')
 
-            if data['op_name'] != data['config']['name']:
+            if data['op_name'] != data['prps']['name']:
                 raise ValueError('Invalid data')
 
             for id, v in data['bm_opts'].items():
-                if not id in data['config']['bm']:
+                if not id in data['bm']['args']:
                     raise ValueError('Invalid data')
-                if v != data['config']['bm'][id]:
+                if v != data['bm']['args'][id]:
                     raise ValueError('Invalid data')
 
             for id, v in data['op_opts'].items():
-                if not id in data['config']:
+                if not id in data['args']:
                     raise ValueError('Invalid data')
-                if v != data['config'][id]:
+                if v != data['args'][id]:
                     raise ValueError('Invalid data')
 
         fold1 = self.fold
@@ -170,7 +173,7 @@ class OptiManager:
                     if os.path.isfile(fold5):
                         continue
                     for op_file in os.listdir(fold5):
-                        if not '.npz' in op_file:
+                        if op_file[0] == '_' or not '.npz' in op_file:
                             continue
                         op_name = op_file.split('.npz')[0]
                         op_path = os.path.join(fold5, op_file)
@@ -191,9 +194,6 @@ class OptiManager:
             bm = Bm(**args)
             if 'bm_opts' in task:
                 bm.set_opts(**task['bm_opts'])
-            if 'bm_seed' in task:
-                # TODO: seed should be the argument of bm.__init__
-                bm.set_seed(task['bm_seed'])
 
             # Create Opti class instance:
             Opti = task['opti']
@@ -210,14 +210,13 @@ class OptiManager:
 
             # Save the results:
             opti.save()
-            if not opti.is_fail:
+            if not opti.err:
                 opti.render(with_wrn=False)
                 opti.show(with_wrn=False)
 
     def show_plot(self, fpath=None, name_map=None, name_spec=None, colors=None,
-                  scale=1., lim_x=None, lim_y=None):
-        """This is draft!!!"""
-        self.check_table()
+                  scale=1., lim_x=None, lim_y=None, ylog=False):
+        self.check_group_for_show()
 
         if colors is None:
             colors = [
@@ -236,21 +235,23 @@ class OptiManager:
                 'skip': bm.is_fail}
 
         plot_deps(data, colors, path(fpath, 'png'), name_spec,
-            lim_x=lim_x, lim_y=lim_y)
+            lim_x=lim_x, lim_y=lim_y, ylog=ylog)
 
     def show_table(self, prefix='', postfix='', prec=2, kind='mean',
                    is_time=False, prefix_inner='        & ', fail='FAIL',
                    best_cmd='fat', postfix_inner='',
                    prefix_comment_inner='%       > ', with_comment=False):
-        self.check_table()
+        self.check_group_for_show()
         value_best = self.get_best(kind, is_time)
 
         if prefix:
             self.log(prefix)
+
         for bm in self.bms:
             self.log(bm.info_table(prec, value_best, kind, is_time,
                 prefix_inner, fail, best_cmd, postfix_inner,
                 prefix_comment_inner, with_comment))
+
         if postfix:
             self.log(postfix)
 
@@ -260,8 +261,11 @@ class OptiManager:
 
     def sort(self, arg='name', values=None, is_op=False):
         def sort(bm):
-            config = getattr(bm, 'op_config' if is_op else 'bm_config', {})
-            value = config.get(arg)
+            if arg == 'name': # TODO
+                args = getattr(bm, 'op_prps' if is_op else 'bm_prps', {})
+            else:
+                args = getattr(bm, 'op_args' if is_op else 'bm_args', {})
+            value = args.get(arg)
             if values is None:
                 return value
             else:
