@@ -3,19 +3,7 @@ from teneva_bm import *
 from teneva_opti import *
 
 
-OPTIS = [OptiTensProtes, OptiTensTtopt, OptiTensPortfolio]
-
-
-BMS_AGENT = [
-    BmAgentAnt,
-    BmAgentHuman,
-    BmAgentHumanStand,
-    BmAgentPendInv,
-    BmAgentPendInvDouble,
-    BmAgentSwimmer,
-]
-
-
+OPTIS = [OptiTensProtes, OptiTensTtopt, OptiTensPso]
 TASKS = []
 
 
@@ -25,30 +13,31 @@ for Opti in OPTIS:
             'bm': BmQuboMvc,
             'bm_args': {'d': 55, 'pcon': 3, 'seed': 99},
             'opti': Opti,
-            'opti_args': {'m': 1.E+2, 'seed': seed},
+            'opti_args': {'m': 1.E+3, 'seed': seed},
         })
 
 
-for Bm in BMS_AGENT:
+for Bm in [BmAgentPendInv, BmAgentSwimmer]:
     for Opti in OPTIS:
         TASKS.append({
             'bm': Bm,
             'bm_args': {'steps': 250},
             'opti': Opti,
-            'opti_args': {'m': 1.E+2, 'seed': 12345},
+            'opti_args': {'m': 1.E+3, 'seed': 12345},
         })
 
 
-def demo():
-    oman = OptiManager(TASKS, fold='result_demo_baseline')
-    oman.run()
+def demo(fold='result_demo_manager', with_calc=True):
+    if with_calc:
+        oman = OptiManager(TASKS, fold=fold)
+        oman.run()
 
-    oman = OptiManager(fold='result_demo_baseline', is_show=True)
-    oman.load()
-    oman.filter(d=100, bm_name='QuboKnapMvc')
-    oman.sort_by_op(['protes', 'ttopt', 'portfolio'])
-    oman.join_op_seed()
-    print('\n\nLoaded result for QuboKnapMvc:\n')
+    oman = OptiManager(fold=fold, load=True)
+    oman.filter_by_bm(arg='name', value='QuboMvc')
+    oman.sort_by_op(arg='name', values=['pso', 'protes', 'ttopt'])
+    oman.join_by_op_seed()
+
+    print('\n\nLoaded result for QuboMvc:\n')
     oman.show_text()
 
     oman.show_table('\n\nTable for mean:')
@@ -58,6 +47,17 @@ def demo():
     oman.show_table('\n\nTable for mean time:', prec=1, is_time=True)
     oman.show_table('\n\nTable for best time:', kind='best', is_time=True)
     oman.show_table('\n\nTable for wrst time:', kind='wrst', is_time=True)
+
+    oman.show_plot(f'{fold}/QuboMvc')
+
+    oman.load()
+    oman.filter_by_bm(arg='name', value='AgentSwimmer')
+    oman.sort_by_op(arg='name', values=['protes', 'ttopt', 'pso'])
+
+    print('\n\n\n\nLoaded result for AgentSwimmer:\n')
+    oman.show_text()
+    oman.show_table('\n\nTable:')
+    oman.show_plot(f'{fold}/AgentSwimmer')
 
 
 if __name__ == '__main__':
