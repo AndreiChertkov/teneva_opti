@@ -31,7 +31,9 @@ DESC = """
 
 class OptiTensPso(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('pso', DESC, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.set_name('pso')
+        self.set_desc(DESC)
 
     def _optimize(self):
         self._optimize_ng_helper(ng.optimizers.PSO)

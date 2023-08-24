@@ -5,39 +5,50 @@ from teneva_opti import OptiTens
 
 
 DESC = """
-    The OptimaTT optimizer. See the repo teneva:
-    https://github.com/AndreiChertkov/teneva
-    and the paper "Optimization of functions given in the tensor train format":
+    Optima-TT optimizer.
+    We use the implementation from the teneva (v. >=0.14.6) package [1]
+    with default parameters. The method is based on the TT-format, see [2].
+
+
+    Links:
+    [1] https://github.com/AndreiChertkov/teneva
+    [2] Optimization of functions given in the tensor train format":
     https://arxiv.org/pdf/2209.14808.pdf
 """
 
 
 class OptiTensOptimatt(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('optimatt', DESC, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.set_name('optimatt')
+        self.set_desc(DESC)
 
-    def get_config(self):
-        conf = super().get_config()
-        conf['dr_max'] = self.dr_max
-        return conf
-
-    def info(self, footer=''):
-        text = ''
-
-        text += 'dr_max (max rank increment)              : '
-        v = self.dr_max
-        text += f'{v}\n'
-
-        return super().info(text + footer)
-
-    def set_opts(self, dr_max=2):
-        self.dr_max = dr_max
+    @property
+    def opts_info(self):
+        return {**super().opts_info,
+            'r0': {
+                'desc': 'Initial TT-rank',
+                'kind': 'int',
+                'dflt': 1
+            },
+            'dr_max': {
+                'desc': 'Maximum TT-rank increment',
+                'kind': 'int',
+                'dflt': 2
+            },
+            'eps': {
+                'desc': 'Maximum TT-rank increment',
+                'kind': 'float',
+                'form': '.1e',
+                'dflt': 1.E-8
+            },
+        }
 
     def _optimize(self):
-        Y = teneva.rand(self.n, r=1)
-        Y = teneva.cross(self.target, Y, e=1.E-16, m=self.bm.budget_m-2,
+        Y = teneva.rand(self.n, r=self.r0, seed=self.seed)
+        Y = teneva.cross(self.target, Y, e=self.eps, m=self.bm.budget_m-2,
             dr_max=self.dr_max)
-        Y = teneva.truncate(Y, e=1.E-16)
+        Y = teneva.truncate(Y, e=self.eps)
 
         i_min, y_min, i_max, y_max = teneva.optima_tt(Y)
         self.target(i_min)

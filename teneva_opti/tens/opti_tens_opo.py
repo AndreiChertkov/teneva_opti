@@ -22,7 +22,9 @@ DESC = """
 
 class OptiTensOpo(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('opo', DESC, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.set_name('opo')
+        self.set_desc(DESC)
 
     def _optimize(self):
         self._optimize_ng_helper(ng.optimizers.OnePlusOne)

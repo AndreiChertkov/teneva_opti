@@ -21,7 +21,9 @@ DESC = """
 
 class OptiTensNb(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('nb', DESC, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.set_name('nb')
+        self.set_desc(DESC)
 
     def _optimize(self):
         self._optimize_ng_helper(ng.optimizers.NoisyBandit)

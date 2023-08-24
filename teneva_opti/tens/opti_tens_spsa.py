@@ -33,7 +33,9 @@ DESC = """
 
 class OptiTensSpsa(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('spsa', DESC, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.set_name('spsa')
+        self.set_desc(DESC)
 
     def _optimize(self):
         self._optimize_ng_helper(ng.optimizers.SPSA)

@@ -5,48 +5,44 @@ from teneva_opti import OptiTens
 
 
 DESC = """
-    The TTOpt optimizer. See the repo ttpot:
-    https://github.com/AndreiChertkov/ttopt
-    and the paper "TTOpt: A maximum volume quantized tensor train-based
-    optimization and its application to reinforcement learning":
+    TTOpt optimizer.
+    We use the implementation from the ttopt (v. 0.6.2) package [1]
+    with default parameters. The method is based on the TT-format, see [2].
+
+    Links:
+    [1] https://github.com/AndreiChertkov/ttopt
+    [2] TTOpt: A maximum volume quantized tensor train-based optimization and
+    its application to reinforcement learning
     https://openreview.net/forum?id=Kf8sfv0RckB
 """
 
 
 class OptiTensTtopt(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('ttopt', DESC, *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.set_name('ttopt')
+        self.set_desc(DESC)
 
-    def get_config(self):
-        conf = super().get_config()
-        conf['rank'] = self.rank
-        conf['fs_opt'] = self.fs_opt
-        conf['quan'] = self.quan
-        conf['with_quan'] = self.with_quan
-        return conf
-
-    def info(self, footer=''):
-        text = ''
-
-        text += 'rank (TT-rank)                           : '
-        v = self.rank
-        text += f'{v}\n'
-
-        text += 'fs_opt (transformation option)           : '
-        v = self.fs_opt
-        text += f'{v}\n'
-
-        if self.with_quan:
-            text += 'quan (use quantization of tensor modes)  : '
-            v = 'YES' if self.with_quan else 'no'
-            text += f'{v}\n'
-
-        return super().info(text + footer)
-
-    def set_opts(self, rank=4, fs_opt=1., quan=True):
-        self.rank = rank
-        self.fs_opt = fs_opt
-        self.quan = quan
+    @property
+    def opts_info(self):
+        return {**super().opts_info,
+            'rank': {
+                'desc': 'TT-rank',
+                'kind': 'int',
+                'dflt': 4
+            },
+            'fs_opt': {
+                'desc': 'Transformation option',
+                'kind': 'float',
+                'form': '.1f',
+                'dflt': 1.
+            },
+            'quan': {
+                'desc': 'Use quantization of tensor modes',
+                'kind': 'bool',
+                'dflt': True
+            },
+        }
 
     def _optimize(self):
         tto = TTOpt(f=self.target, d=self.d_inner, n=self.n_inner,
