@@ -33,8 +33,8 @@ DESC = """
 
 class OptiTensSpsa(OptiTens):
     def __init__(self, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'spsa')
         super().__init__(*args, **kwargs)
-        self.set_name('spsa')
         self.set_desc(DESC)
 
     def _optimize(self):

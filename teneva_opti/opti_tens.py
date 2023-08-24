@@ -29,17 +29,26 @@ class OptiTens(Opti):
         return self.n0
 
     @property
+    def prps_info(self):
+        return {**super().prps_info,
+            'with_quan': {
+                'desc': 'With quantization of tensor modes',
+                'kind': 'bool',
+                'info_skip_if_none': 'quan'
+            }
+        }
+
+    @property
     def with_quan(self):
-        if not self.quan:
+        if not self.opts.get('quan'):
             return False
         if not self.is_n_equal:
+            return False
+        if self.n0 == 2:
             return False
         if 2**int(np.log2(self.n0)) != self.n0:
             return False
         return True
-
-    def init(self):
-        self.quan = False
 
     def target(self, i):
         if self.with_quan:

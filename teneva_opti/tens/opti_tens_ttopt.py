@@ -19,8 +19,8 @@ DESC = """
 
 class OptiTensTtopt(OptiTens):
     def __init__(self, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'ttopt')
         super().__init__(*args, **kwargs)
-        self.set_name('ttopt')
         self.set_desc(DESC)
 
     @property
@@ -38,7 +38,7 @@ class OptiTensTtopt(OptiTens):
                 'dflt': 1.
             },
             'quan': {
-                'desc': 'Use quantization of tensor modes',
+                'desc': 'Allow quantization of modes',
                 'kind': 'bool',
                 'dflt': True
             },

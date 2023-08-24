@@ -21,8 +21,8 @@ DESC = """
 
 class OptiTensNb(OptiTens):
     def __init__(self, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'nb')
         super().__init__(*args, **kwargs)
-        self.set_name('nb')
         self.set_desc(DESC)
 
     def _optimize(self):

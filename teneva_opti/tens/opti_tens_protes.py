@@ -25,7 +25,9 @@ DESC = """
 
 class OptiTensProtes(OptiTens):
     def __init__(self, *args, **kwargs):
-        super().__init__('protes', DESC, *args, **kwargs)
+        kwargs['name'] = kwargs.get('name', 'protes')
+        super().__init__(*args, **kwargs)
+        self.set_desc(DESC)
 
     @property
     def opts_info(self):
@@ -57,7 +59,7 @@ class OptiTensProtes(OptiTens):
                 'dflt': 5
             },
             'quan': {
-                'desc': 'Use quantization of tensor modes',
+                'desc': 'Allow quantization of modes',
                 'kind': 'bool',
                 'dflt': True
             },

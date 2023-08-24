@@ -46,8 +46,8 @@ DESC = """
 
 class OptiTensPortfolio(OptiTens):
     def __init__(self, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'portfolio')
         super().__init__(*args, **kwargs)
-        self.set_name('portfolio')
         self.set_desc(DESC)
 
     def _optimize(self):

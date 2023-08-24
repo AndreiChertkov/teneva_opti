@@ -31,8 +31,8 @@ DESC = """
 
 class OptiTensPso(OptiTens):
     def __init__(self, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'pso')
         super().__init__(*args, **kwargs)
-        self.set_name('pso')
         self.set_desc(DESC)
 
     def _optimize(self):

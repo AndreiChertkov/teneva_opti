@@ -19,8 +19,8 @@ DESC = """
 
 class OptiTensOptimatt(OptiTens):
     def __init__(self, *args, **kwargs):
+        kwargs['name'] = kwargs.get('name', 'optimatt')
         super().__init__(*args, **kwargs)
-        self.set_name('optimatt')
         self.set_desc(DESC)
 
     @property
