@@ -25,6 +25,10 @@ class Opti:
         if not self.bm.is_prep:
             self.bm.prep()
 
+        if self.bm.is_opti_max and self.bm.is_opti_min:
+            msg = 'Benchmark should has one only one task (min of max)'
+            raise NotImplementedError(msg)
+
         self.log = Log(self.fpath('log') if log_file else None, log, log_info)
         self.log_with_desc = log_with_desc
 
