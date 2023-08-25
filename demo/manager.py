@@ -21,7 +21,8 @@ for Bm in [BmAgentPendInv, BmAgentSwimmer]:
     for Opti in OPTIS:
         TASKS.append({
             'bm': Bm,
-            'bm_args': {'steps': 250},
+            # We set "long" seed to check the log with auto-line break:
+            'bm_args': {'steps': 250, 'seed': 12345678},
             'opti': Opti,
             'opti_args': {'m': 1.E+3, 'seed': 12345},
         })

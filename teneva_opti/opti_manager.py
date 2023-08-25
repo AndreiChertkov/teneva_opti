@@ -79,16 +79,20 @@ class OptiManager:
         text = ''
 
         name = bm.name[:(len_max-1)]
-        text += '\n'
-        text += '- BM   > ' + name + ' '*(len_max-len(name))
-        text += ' [' + get_identity_str(bm, pretty=True) + ']'
+        text_bm = '\n- BM   > ' + name + ' '*(len_max-len(name))
+        text_args = ' [' + get_identity_str(bm, pretty=True) + ']'
+        if len(text_bm + text_args) > 79:
+            text_bm += '\n '
+        text_bm += text_args
 
         name = opti.name[:(len_max-1)]
-        text += '\n'
-        text += '- OPTI > ' + name + ' '*(len_max-len(name))
-        text += ' [' + get_identity_str(opti, pretty=True) + ']'
+        text_op = '\n- OPTI > ' + name + ' '*(len_max-len(name))
+        text_args = ' [' + get_identity_str(opti, pretty=True) + ']'
+        if len(text_op + text_args) > 79:
+            text_op += '\n '
+        text_op += text_args
 
-        return text
+        return text_bm + text_op
 
     def info_history(self, opti, len_max=27):
         text = '  >>>>>> '

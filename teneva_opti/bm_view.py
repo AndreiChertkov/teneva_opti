@@ -266,9 +266,15 @@ class BmView:
         else:
             pref = ''
         args = copy(self.bm_args)
+        del args['name']
         text += pref + name + ' ' * max(0, len_max-len(name))
-        text += ' [' + self.get_opt_str(args, pretty=True) + ']'
-        return text
+
+        text_args = ' [' + self.get_opt_str(args, pretty=True) + ']'
+
+        if len(text + text_args) > 79:
+            return text + '\n ' + text_args
+        else:
+            return text + text_args
 
     def info_text_op(self, len_max=21, with_prefix=True):
         text = ''
@@ -285,8 +291,13 @@ class BmView:
             args['SEEDS'] = len(self.op_seed_list)
             del args['seed']
         text += pref + name + ' ' * max(0, len_max-len(name))
-        text += ' [' + self.get_opt_str(args, pretty=True) + ']'
-        return text
+
+        text_args = ' [' + self.get_opt_str(args, pretty=True) + ']'
+
+        if len(text + text_args) > 79:
+            return text + '\n ' + text_args
+        else:
+            return text + text_args
 
     def is_better(self, value, kind='mean', is_time=False):
         if value is None:
