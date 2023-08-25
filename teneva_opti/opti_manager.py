@@ -55,10 +55,7 @@ class OptiManager:
 
         bms = []
         for bm in self.bms:
-            if arg == 'name': # TODO
-                args = getattr(bm, 'op_prps' if is_op else 'bm_prps', {})
-            else:
-                args = getattr(bm, 'op_args' if is_op else 'bm_args', {})
+            args = getattr(bm, 'op_args' if is_op else 'bm_args', {})
             value_ref = args.get(arg)
             if value == value_ref:
                 bms.append(bm)
@@ -140,10 +137,10 @@ class OptiManager:
             return opts
 
         def check(data):
-            if data['bm_name'] != data['bm']['prps']['name']:
+            if data['bm_name'] != data['bm']['args']['name']:
                 raise ValueError('Invalid data')
 
-            if data['op_name'] != data['prps']['name']:
+            if data['op_name'] != data['args']['name']:
                 raise ValueError('Invalid data')
 
             for id, v in data['bm_opts'].items():
@@ -261,10 +258,7 @@ class OptiManager:
 
     def sort(self, arg='name', values=None, is_op=False):
         def sort(bm):
-            if arg == 'name': # TODO
-                args = getattr(bm, 'op_prps' if is_op else 'bm_prps', {})
-            else:
-                args = getattr(bm, 'op_args' if is_op else 'bm_args', {})
+            args = getattr(bm, 'op_args' if is_op else 'bm_args', {})
             value = args.get(arg)
             if values is None:
                 return value

@@ -158,8 +158,8 @@ class BmView:
         self.d = self.bm_args['d']
         self.n = self.bm_args['n']
 
-        self.bm_name = self.bm_prps['name']
-        self.op_name = self.op_prps['name']
+        self.bm_name = self.bm_args['name']
+        self.op_name = self.op_args['name']
 
         self.bm_seed = self.bm_args['seed']
         self.op_seed = self.op_args['seed']

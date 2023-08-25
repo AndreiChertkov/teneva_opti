@@ -55,6 +55,10 @@ class Opti:
                 'desc': 'Random seed',
                 'kind': 'int'
             },
+            'name': {
+                'desc': 'Optimizer name',
+                'kind': 'str'
+            },
             'fold': {
                 'desc': 'Folder with results',
                 'kind': 'str'
@@ -114,7 +118,7 @@ class Opti:
     @property
     def identity(self):
         """Get a list of arg names that define the optimizer."""
-        return ['seed', 'm']
+        return ['m', 'seed']
 
     @property
     def is_bm_func(self):
@@ -193,10 +197,6 @@ class Opti:
                 'desc': 'Optimizer class name',
                 'kind': 'str'
             },
-            'name': {
-                'desc': 'Optimizer name',
-                'kind': 'str'
-            },
             'is_func': {
                 'desc': 'Optimizer is continuous',
                 'kind': 'bool',
@@ -271,22 +271,25 @@ class Opti:
         if self.log_with_desc:
             text += self.info_desc()
 
-        if len(self.args_info):
-            text += self.info_section('Arguments')
-            for name, opt in self.args_info.items():
-                text += self.info_var(name, opt, with_name=True)
+        text_section = ''
+        for name, opt in self.args_info.items():
+            text_section += self.info_var(name, opt, with_name=True)
+        if text_section:
+            text += self.info_section('Arguments') + text_section
 
-        if len(self.opts_info):
-            text += self.info_section('Options')
-            for name, opt in self.opts_info.items():
-                text += self.info_var(name, opt, with_name=True)
+        text_section = ''
+        for name, opt in self.opts_info.items():
+            text_section += self.info_var(name, opt, with_name=True)
+        if text_section:
+            text += self.info_section('Options') + text_section
 
-        if len(self.prps_info):
-            text += self.info_section('Properties')
-            for name, opt in self.prps_info.items():
-                text += self.info_var(name, opt, skip_none=True)
+        text_section = ''
+        for name, opt in self.prps_info.items():
+            text_section += self.info_var(name, opt, skip_none=True)
+        if text_section:
+            text += self.info_section('Properties') + text_section
 
-        return text + footer + '#' * 78 + '\n'
+        return text + footer + '=' * 78 + '\n'
 
     def info_desc(self):
         text = '.' * 78 + '\n'
