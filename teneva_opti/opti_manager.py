@@ -183,7 +183,7 @@ class OptiManager:
                         check(data)
                         self.bms.append(BmView(data))
 
-    def run(self):
+    def run(self, with_err=False):
         for task in self.tasks:
             # Create Bm class instance:
             Bm = task['bm']
@@ -202,7 +202,7 @@ class OptiManager:
 
             # Run the optimization:
             self.log(self.info(bm, opti))
-            opti.run(with_err=False)
+            opti.run(with_err=with_err)
             self.log(self.info_history(opti))
 
             # Save the results:

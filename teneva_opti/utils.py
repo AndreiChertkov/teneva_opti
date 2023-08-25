@@ -11,8 +11,8 @@ class Log:
         self.is_file_add = is_file_add
         self.is_file_new = True
 
-    def __call__(self, text):
-        if self.with_log:
+    def __call__(self, text, force_log=False):
+        if self.with_log or force_log:
             print(text)
         if self.fpath:
             opt = 'w' if self.is_file_new and not self.is_file_add else 'a+'
@@ -34,7 +34,7 @@ class Log:
         self(f'DONE {content}')
 
     def wrn(self, content=''):
-        self(f'WRN ! {content}')
+        self(f'WRN ! {content}', force_log=True)
 
 
 def get_identity(obj):
