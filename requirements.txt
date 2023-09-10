@@ -6,6 +6,6 @@ numpy>=1.22;python_version>="3.9"
 pandas<=1.5.3
 protes==0.3.4
 seaborn>=0.12.2
-teneva>=0.14.6
-teneva_bm==0.8.2
+teneva>=0.14.7
+teneva_bm==0.8.3
 ttopt==0.6.2
