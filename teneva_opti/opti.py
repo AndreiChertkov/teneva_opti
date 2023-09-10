@@ -141,7 +141,7 @@ class Opti:
 
     @property
     def is_max(self):
-        """Get true if we solv maximization problem."""
+        """Get true if we solve maximization problem."""
         return self.bm.is_opti_max
 
     @property
