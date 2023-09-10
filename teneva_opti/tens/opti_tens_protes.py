@@ -1,7 +1,12 @@
-import jax
-# jax.config.update('jax_enable_x64', True)
-jax.config.update('jax_platform_name', 'cpu')
-jax.default_device(jax.devices('cpu')[0])
+import os
+
+
+TENEVA_OPTI_JAX_CPU = os.environ.get('TENEVA_OPTI_JAX_CPU', 'True') == 'True'
+if TENEVA_OPTI_JAX_CPU:
+    import jax
+    # jax.config.update('jax_enable_x64', True)
+    jax.config.update('jax_platform_name', 'cpu')
+    jax.default_device(jax.devices('cpu')[0])
 
 
 from protes import protes
