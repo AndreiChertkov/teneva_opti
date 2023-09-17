@@ -62,6 +62,7 @@ def plot_deps(data, colors, fpath=None, name_spec=None,
 
     if fpath:
         plt.savefig(fpath, bbox_inches='tight')
+        plt.close(fig)
     else:
         plt.show()
 
