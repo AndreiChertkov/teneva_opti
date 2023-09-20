@@ -10,8 +10,9 @@ from teneva_opti import __version__
 
 class Opti:
     def __init__(self, bm, m=1.E+4, seed=0, name='optimizer',
-                 fold='result_demo', machine='', with_cache=True,
-                 log=True, log_info=False, log_file=False, log_with_desc=True):
+                 fold='result_demo', machine='', with_cache=True, log=True,
+                 log_info=False, log_file=False, log_with_desc=True,
+                 with_inp_tens_mix=False):
         self.bm = bm
         self.m = int(m)
         self.seed = seed
@@ -35,6 +36,13 @@ class Opti:
         self.bm.set_log(self.log, prefix=self.name,
             cond=('max' if self.is_max else 'min'),
             with_max=self.is_max, with_min=not self.is_max)
+
+        self.with_inp_tens_mix = with_inp_tens_mix
+        if self.with_inp_tens_mix:
+            rand = np.random.default_rng(42)
+            self.inp_tens_mix = rand.permutation(np.arange(self.d))
+        else:
+            self.inp_tens_mix = None
 
         self.err = ''
         self.set_desc('optimizer_description')
@@ -75,7 +83,12 @@ class Opti:
             'with_cache': {
                 'desc': 'Use cache',
                 'kind': 'bool'
-            }
+            },
+            'with_inp_tens_mix': {
+                'desc': 'Random permutation of input',
+                'kind': 'bool',
+                'info_skip_if_none': True
+            },
         }
 
     @property
@@ -459,9 +472,16 @@ class Opti:
         """Get the value(s) of the used benchmark for point."""
         return self.bm.get_poi(x)
 
-    def target_tens(self, i):
+    def target_tens(self, I):
         """Get the value(s) of the used benchmark for index."""
-        return self.bm.get(i)
+        I = np.asanyarray(I, dtype=int)
+        if len(I.shape) == 1:
+            I = I.reshape(1, -1)
+
+        if self.inp_tens_mix is not None:
+            I = I[:, self.inp_tens_mix]
+
+        return self.bm.get(I)
 
     def _optimize(self):
         """Inner function which perform optimization process."""
