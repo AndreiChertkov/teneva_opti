@@ -18,7 +18,7 @@ Collection of various optimization methods (search for the global minimum and/or
     ```bash
     wget https://raw.githubusercontent.com/AndreiChertkov/teneva_bm/main/install_all.py && python install_all.py --env teneva_opti && rm install_all.py
     ```
-    > In the case of problems with `scikit-learn`, uninstall it as `pip uninstall scikit-learn` and then install it from the anaconda: `conda install -c anaconda scikit-learn`.
+    > In the case of problems with `scikit-learn`, uninstall it as `pip uninstall scikit-learn` and then install it from the anaconda: `conda install -c anaconda scikit-learn`. If you have problems downloading the script via wget, you can download it manually from the root folder of the repository [teneva_bm](https://github.com/AndreiChertkov/teneva_bm).
 
 
 ## Documentation and examples (in progress...)
@@ -28,7 +28,7 @@ Please, run the demo script from the root of the [teneva_opti](https://github.co
 clear && python demo/base.py
 ```
 
-> See also other demo` scripts in the folder `demo` of the [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) repository.
+> See also other demo scripts in the folder `demo` of the [teneva_opti](https://github.com/AndreiChertkov/teneva_opti) repository.
 
 
 ## Authors
