@@ -67,11 +67,12 @@ class OptiTensProtes(OptiTens):
             'quan': {
                 'desc': 'Allow quantization of modes',
                 'kind': 'bool',
-                'dflt': False
+                'dflt': True
             },
         }
 
     def _optimize(self):
+        print(self.d_inner, self.n0_inner, self.is_n_equal)
         if self.is_n_equal:
             protes(self.target, self.d_inner, self.n0_inner, 1.E+99,
                 k=self.k, k_top=self.k_top, k_gd=self.k_gd, lr=self.lr,
