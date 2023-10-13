@@ -485,7 +485,7 @@ class Opti:
 
         y = self.bm.get(I)
 
-        return y if is_batch else y[0]
+        return y if is_batch or y is None else y[0]
 
     def _optimize(self):
         """Inner function which perform optimization process."""
