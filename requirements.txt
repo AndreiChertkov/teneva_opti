@@ -1,11 +1,13 @@
 matplotlib>=3.7.0,<3.7.1;python_version=="3.8"
 matplotlib>=3.7.0;python_version>="3.9"
+ml_dtypes<=0.2.0;python_version=="3.8"
+ml_dtypes;python_version>="3.9"
 nevergrad==0.8.0
 numpy>=1.22,<1.25;python_version=="3.8"
 numpy>=1.22;python_version>="3.9"
 pandas<=1.5.3
 protes==0.3.4
-seaborn>=0.12.2
+seaborn==0.12.2
 teneva>=0.14.7
 teneva_bm==0.8.4
 ttopt==0.6.2
