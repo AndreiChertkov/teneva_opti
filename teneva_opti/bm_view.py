@@ -76,8 +76,8 @@ class BmView:
             self.init_from_bm(bm)
 
         self.op_seed_list.append(bm.op_seed)
-        self.y_all_list.append(bm.y_list)
-        self.y_opt_list.append(bm.y_opt)
+        self.y_all_list.append(copy(bm.y_list))
+        self.y_opt_list.append(copy(bm.y_opt))
         self.t_list.append(bm.t)
         if bm.is_fail:
             self.is_fail = True
