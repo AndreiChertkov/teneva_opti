@@ -6,7 +6,7 @@ from teneva_opti import OptiTens
 
 DESC = """
     Simultaneous Perturbation Stochastic Approximation (SPSA) [1, 2].
-    We use the implementation from the nevergrad (v. 0.11.0) package [3]
+    We use the implementation from the nevergrad (v. 0.8.0) package [3]
     with default parameters.
 
     The SPSA method is based on the classical gradient descent formula,

@@ -12,7 +12,7 @@ DESC = """
 
     Links:
     [1] https://github.com/AndreiChertkov/teneva
-    [2] Optimization of functions given in the tensor train format":
+    [2] Optimization of functions given in the tensor train format
     https://arxiv.org/pdf/2209.14808.pdf
 """
 
@@ -37,7 +37,7 @@ class OptiTensOptimatt(OptiTens):
                 'dflt': 2
             },
             'eps': {
-                'desc': 'Maximum TT-rank increment',
+                'desc': 'TT-cross convergence parameter',
                 'kind': 'float',
                 'form': '.1e',
                 'dflt': 1.E-8

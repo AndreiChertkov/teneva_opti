@@ -24,7 +24,8 @@ DESC = """
     Links:
     [1] https://github.com/anabatsh/PROTES
     [2] PROTES: Probabilistic optimization with tensor sampling
-    https://arxiv.org/pdf/2301.12162.pdf
+    https://arxiv.org/pdf/2301.12162.pdf;
+    https://neurips.cc/virtual/2023/poster/71674
 """
 
 
@@ -66,7 +67,7 @@ class OptiTensProtes(OptiTens):
             'quan': {
                 'desc': 'Allow quantization of modes',
                 'kind': 'bool',
-                'dflt': True
+                'dflt': False
             },
         }
 

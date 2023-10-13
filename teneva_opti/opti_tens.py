@@ -50,10 +50,10 @@ class OptiTens(Opti):
             return False
         return True
 
-    def target(self, i):
+    def target(self, I):
         if self.with_quan:
-            i = self.unquantize(i)
-        return self.target_tens(i)
+            I = self.unquantize(I)
+        return self.target_tens(I)
 
     def unquantize(self, I_qtt):
         if len(I_qtt.shape) == 1:

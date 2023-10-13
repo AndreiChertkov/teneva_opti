@@ -6,5 +6,5 @@ class OptiFunc(Opti):
     def is_func(self):
         return True
 
-    def target(self, x):
-        return self.target_func(x)
+    def target(self, X):
+        return self.target_func(X)

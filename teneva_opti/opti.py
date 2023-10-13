@@ -10,8 +10,8 @@ from teneva_opti import __version__
 
 class Opti:
     def __init__(self, bm, m=1.E+4, seed=0, name='optimizer',
-                 fold='result_demo', machine='', with_cache=True, log=True,
-                 log_info=False, log_file=False, log_with_desc=True,
+                 fold='result_demo', machine='', m_cache=None, with_cache=True,
+                 log=True, log_info=False, log_file=False, log_with_desc=True,
                  with_inp_tens_mix=False):
         self.bm = bm
         self.m = int(m)
@@ -22,12 +22,12 @@ class Opti:
         self.with_cache = with_cache
 
         self.bm.set_cache(self.with_cache)
-        self.bm.set_budget(self.m, m_cache=self.m)
+        self.bm.set_budget(self.m, m_cache=(m_cache or self.m))
         if not self.bm.is_prep:
             self.bm.prep()
 
         if self.bm.is_opti_max and self.bm.is_opti_min:
-            msg = 'Benchmark should has one only one task (min of max)'
+            msg = 'Benchmark should has one only one task (min or max)'
             raise NotImplementedError(msg)
 
         self.log = Log(self.fpath('log') if log_file else None, log, log_info)
@@ -35,7 +35,7 @@ class Opti:
 
         self.bm.set_log(self.log, prefix=self.name,
             cond=('max' if self.is_max else 'min'),
-            with_max=self.is_max, with_min=not self.is_max)
+            with_max=self.is_max, with_min=self.is_min)
 
         self.with_inp_tens_mix = with_inp_tens_mix
         if self.with_inp_tens_mix:
@@ -85,7 +85,7 @@ class Opti:
                 'kind': 'bool'
             },
             'with_inp_tens_mix': {
-                'desc': 'Random permutation of input',
+                'desc': 'Random permutation',
                 'kind': 'bool',
                 'info_skip_if_none': True
             },
@@ -468,20 +468,24 @@ class Opti:
         """Get the value(s) of the used benchmark for index or point."""
         raise NotImplementedError
 
-    def target_func(self, x):
+    def target_func(self, X):
         """Get the value(s) of the used benchmark for point."""
-        return self.bm.get_poi(x)
+        return self.bm.get_poi(X)
 
     def target_tens(self, I):
         """Get the value(s) of the used benchmark for index."""
         I = np.asanyarray(I, dtype=int)
-        if len(I.shape) == 1:
+
+        is_batch = len(I.shape) == 2
+        if not is_batch:
             I = I.reshape(1, -1)
 
         if self.inp_tens_mix is not None:
             I = I[:, self.inp_tens_mix]
 
-        return self.bm.get(I)
+        y = self.bm.get(I)
+
+        return y if is_batch else y[0]
 
     def _optimize(self):
         """Inner function which perform optimization process."""
