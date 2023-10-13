@@ -3,7 +3,7 @@ import numpy as np
 
 
 class BmView:
-    def __init__(self, data=None):
+    def __init__(self, data=None, bm=None):
         self.bms = []
         self.op_seed_list = []
         self.y_all_list = []
@@ -13,6 +13,8 @@ class BmView:
 
         if data is not None:
             self.init_from_data(data)
+        if bm is not None:
+            self.init_from_bm(bm)
 
     @property
     def is_group(self):
@@ -107,26 +109,26 @@ class BmView:
         return ('; ' if pretty else '__').join(res)
 
     def init_from_bm(self, bm):
-        self.bm_args = bm.bm_args
-        self.op_args = bm.op_args
+        self.bm_args = copy(bm.bm_args)
+        self.op_args = copy(bm.op_args)
 
-        self.bm_opts = bm.bm_opts
-        self.op_opts = bm.op_opts
+        self.bm_opts = copy(bm.bm_opts)
+        self.op_opts = copy(bm.op_opts)
 
-        self.bm_prps = bm.bm_prps
-        self.op_prps = bm.op_prps
+        self.bm_prps = copy(bm.bm_prps)
+        self.op_prps = copy(bm.op_prps)
 
-        self.bm_hist = bm.bm_hist
-        self.op_hist = bm.op_hist
+        self.bm_hist = copy(bm.bm_hist)
+        self.op_hist = copy(bm.op_hist)
 
         self.d = bm.d
-        self.n = bm.n
+        self.n = copy(bm.n)
 
         self.bm_name = bm.bm_name
         self.op_name = bm.op_name
 
         self.bm_seed = bm.bm_seed
-        self.op_seed = None
+        self.op_seed = bm.op_seed
 
         self.is_max = bm.is_max
         self.is_min = bm.is_min
@@ -135,8 +137,8 @@ class BmView:
 
         self.t = bm.t
 
-        self.y_list = bm.y_list
-        self.y_list_full = bm.y_list_full
+        self.y_list = copy(bm.y_list)
+        self.y_list_full = copy(bm.y_list_full)
 
         self.is_fail = bm.is_fail
 

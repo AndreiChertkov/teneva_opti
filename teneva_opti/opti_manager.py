@@ -19,6 +19,7 @@ class OptiManager:
         fpath = os.path.join(self.fold, fname)
         self.log = Log(fpath, is_file_add=load)
 
+        self.bms_loaded = []
         self.bms = []
 
         if load:
@@ -123,6 +124,7 @@ class OptiManager:
         self.bms = bms
 
     def load(self):
+        self.bms_loaded = []
         self.bms = []
 
         def opts_str_to_dict(opts_str):
@@ -185,7 +187,14 @@ class OptiManager:
                         data['bm_name'] = bm_name
                         data['op_name'] = op_name
                         check(data)
-                        self.bms.append(BmView(data))
+                        self.bms_loaded.append(BmView(data))
+
+        self.reset()
+
+    def reset(self):
+        self.bms = []
+        for bm in self.bms_loaded:
+            self.bms.append(BmView(bm=bm))
 
     def run(self, with_err=False):
         for task in self.tasks:
