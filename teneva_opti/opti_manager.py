@@ -237,11 +237,7 @@ class OptiManager:
         data = {}
         for bm in self.bms:
             name = name_map[bm.op_name] if name_map else bm.op_name
-            data[name] = {
-                'best': np.array(bm.y_all_best) / scale,
-                'mean': np.array(bm.y_all_mean) / scale,
-                'wrst': np.array(bm.y_all_wrst) / scale,
-                'skip': bm.is_fail}
+            data[name] = bm.get_lists()
 
         plot_deps(data, colors, path(fpath, 'png'), name_spec,
             lim_x=lim_x, lim_y=lim_y, ylog=ylog)

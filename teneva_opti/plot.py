@@ -41,17 +41,14 @@ def plot_deps(data, colors, fpath=None, name_spec=None,
         if item.get('skip') == True:
             continue
 
-        y = np.array(item['mean'])
-        y_best = np.array(item['best'])
-        y_wrst = np.array(item['wrst'])
-        x = np.arange(len(y)) + 1
-        linewidth = 1 if name_spec == name else 1
-        ax.plot(x, y, label=name, color=colors[i],
-            marker='o', markersize=0, linewidth=linewidth)
+        x = np.arange(len(item['avg'])) + 1
 
-        ax.fill_between(x, y_wrst, y_best, alpha=0.4, color=colors[i])
+        ax.plot(x, item['avg'], label=name, color=colors[i],
+            marker='o', markersize=0, linewidth=1 if name_spec == name else 1)
 
-        is_neg = is_neg or np.min(y_best) < 0 or np.min(y_wrst) < 0
+        ax.fill_between(x, item['min'], item['max'], alpha=0.4, color=colors[i])
+
+        is_neg = is_neg or np.min(item['min']) < 0
 
     _prep_ax(ax, xlog=True, ylog=ylog, leg=True, is_neg=is_neg)
 

@@ -33,30 +33,6 @@ class BmView:
         return np.max(self.t_list)
 
     @property
-    def y_all_best(self):
-        if not self.is_group:
-            return self.values_to_opt(self.y_list)
-
-        y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
-        return self.values_to_one(y_lists, kind='best')
-
-    @property
-    def y_all_mean(self):
-        if not self.is_group:
-            return self.values_to_opt(self.y_list)
-
-        y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
-        return self.values_to_one(y_lists, kind='mean')
-
-    @property
-    def y_all_wrst(self):
-        if not self.is_group:
-            return self.values_to_opt(self.y_list)
-
-        y_lists = [self.values_to_opt(y_all) for y_all in self.y_all_list]
-        return self.values_to_one(y_lists, kind='wrst')
-
-    @property
     def y_opt_best(self):
         y = self.y_opt_list
         return np.max(y) if self.is_max else np.min(y)
@@ -96,6 +72,30 @@ class BmView:
                 raise ValueError('Invalid kind')
         else:
             return self.t if is_time else self.y_opt
+
+    def get_lists(self):
+        if self.is_fail:
+            return {'best': None, 'mean': None, 'wrst': None, 'skip': True}
+
+        Y = []
+        # m = np.max([len(y_list) for y_list in self.y_all_list])
+        m = self.bm_prps['budget_m']
+        for y_list in self.y_all_list:
+            if len(y_list) < m:
+                y_list = y_list + [y_list[-1]]*(m - len(y_list))
+            Y.append(y_list)
+
+        Y = np.array(Y)
+        if self.is_max:
+            Y = np.maximum.accumulate(Y, axis=1)
+        else:
+            Y = np.minimum.accumulate(Y, axis=1)
+
+        return {
+            'max': np.max(Y, axis=0),
+            'avg': np.mean(Y, axis=0),
+            'min': np.min(Y, axis=0),
+            'skip': False}
 
     def get_opt_str(self, opts, pretty=True):
         res = []
@@ -345,6 +345,8 @@ class BmView:
             if not id in bm2.op_args:
                 return False
             if bm1.op_args[id] != bm2.op_args[id]:
+                if id in ['fold', 'machine']:
+                    continue
                 return False
 
         for id in bm2.op_args.keys():
@@ -353,38 +355,8 @@ class BmView:
             if not id in bm1.op_args:
                 return False
             if bm1.op_args[id] != bm2.op_args[id]:
+                if id in ['fold', 'machine']:
+                    continue
                 return False
 
         return True
-
-    def values_to_one(self, y_lists, kind='mean'):
-        res = []
-        # lens = [len(y_list) for y_list in y_lists]
-        # for k in range(max(lens)):
-        for k in range(self.bm_prps['budget_m']):
-            vals = []
-            for y_list in y_lists:
-                l = len(y_list)
-                vals.append(y_list[k] if l > k else y_list[l-1])
-            if kind == 'best':
-                res.append(np.max(vals))
-            elif kind == 'mean':
-                res.append(np.mean(vals))
-            elif kind == 'wrst':
-                res.append(np.min(vals))
-            else:
-                raise ValueError('Invalid kind')
-        return res
-
-    def values_to_opt(self, y_list):
-        res = []
-        opt = None
-        for k, v in enumerate(y_list):
-            if opt is None:
-                opt = v
-            elif self.is_max and v > opt:
-                opt = v
-            elif self.is_min and v < opt:
-                opt = v
-            res.append(opt)
-        return res
