@@ -243,7 +243,7 @@ class OptiManager:
             lim_x=lim_x, lim_y=lim_y, ylog=ylog)
 
     def show_table(self, prefix='', postfix='', prec=2, kind='mean',
-                   is_time=False, prefix_inner='        & ', fail='FAIL',
+                   is_time=False, prefix_inner='    & ', fail='FAIL',
                    best_cmd='fat', postfix_inner='',
                    prefix_comment_inner='%       > ', with_comment=False):
         self.check_group_for_show()

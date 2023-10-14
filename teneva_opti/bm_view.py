@@ -181,9 +181,8 @@ class BmView:
         self.is_init = True
 
     def info_table(self, prec=2, value_best=None, kind='mean', is_time=False,
-                   prefix='        & ', fail='FAIL', best_cmd='fat',
-                   postfix='', prefix_comment_inner='%       > ',
-                   with_comment=False):
+                   prefix='    & ', fail='FAIL', best_cmd='fat', postfix='',
+                   prefix_comment_inner='%       > ', with_comment=False):
         form = '{:-10.' + str(prec) + 'e}'
 
         if self.is_fail:
