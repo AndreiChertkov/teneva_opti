@@ -13,6 +13,7 @@ mpl.rcParams.update({
 
 
 import matplotlib.cm as cm
+import matplotlib.pylab as pl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import seaborn as sns
@@ -23,9 +24,16 @@ sns.set_style('white')
 sns.mpl.rcParams['legend.frameon'] = 'False'
 
 
-def plot_deps(data, colors, fpath=None, name_spec=None,
+def plot_deps(data, colors=None, fpath=None, name_spec=None,
               xlabel='Number of requests', ylabel=None, title=None,
-              lim_x=None, lim_y=None, ylog=False):
+              lim_x=None, lim_y=None):
+
+    if colors is None:
+        colors = [
+            '#8b1d1d', '#000099', '#558000', '#ffbf00', '#00FFFF' ,
+            '#CE0071', '#485536', '#FFF800', '#66ffcc', '#5f91ac',
+            '#ff66ff', '#6699ff', '#cc0000', '#333300', '#804000']
+
     fig, ax = plt.subplots(1, 1, figsize=(8, 8))
     plt.subplots_adjust(wspace=0.)
 
@@ -36,7 +44,9 @@ def plot_deps(data, colors, fpath=None, name_spec=None,
     if title:
         ax.set_title(title)
 
-    is_neg = False
+    y_max = -np.infty
+    y_min = +np.infty
+
     for i, (name, item) in enumerate(data.items()):
         if item.get('skip') == True:
             continue
@@ -44,13 +54,16 @@ def plot_deps(data, colors, fpath=None, name_spec=None,
         x = np.arange(len(item['avg'])) + 1
 
         ax.plot(x, item['avg'], label=name, color=colors[i],
-            marker='o', markersize=0, linewidth=1 if name_spec == name else 1)
+            marker='o', markersize=0,
+            linestyle='-' if i < 5 else '--',
+            linewidth=3 if name_spec == name else 1)
 
         ax.fill_between(x, item['min'], item['max'], alpha=0.4, color=colors[i])
 
-        is_neg = is_neg or np.min(item['min']) < 0
+        y_max = max(y_max, np.max(item['max']))
+        y_min = min(y_min, np.min(item['min']))
 
-    _prep_ax(ax, xlog=True, ylog=ylog, leg=True, is_neg=is_neg)
+    _prep_ax(ax, xlog=True, ylog=(y_max - y_min > 300), leg=True)
 
     if lim_x is not None:
         ax.set_xlim(*lim_x)
@@ -64,14 +77,11 @@ def plot_deps(data, colors, fpath=None, name_spec=None,
         plt.show()
 
 
-def _prep_ax(ax, xlog=False, ylog=False, leg=False, xint=False, xticks=None,
-             is_neg=False):
+def _prep_ax(ax, xlog=False, ylog=False, leg=False, xint=False, xticks=None):
     if xlog:
         ax.semilogx()
     if ylog:
-        ax.semilogy()
-        if is_neg:
-            ax.set_yscale('symlog')
+        ax.set_yscale('symlog')
 
     if leg:
         ax.legend(loc='upper left', frameon=True)

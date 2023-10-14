@@ -51,7 +51,7 @@ def demo(fold='result_demo_manager', with_calc=True):
 
     oman.show_plot(f'{fold}/QuboMvc')
 
-    oman.load()
+    oman.reset()
     oman.filter_by_bm(arg='name', value='AgentSwimmer')
     oman.sort_by_op(arg='name', values=['protes', 'ttopt', 'pso'])
 

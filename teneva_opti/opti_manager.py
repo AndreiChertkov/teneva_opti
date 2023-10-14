@@ -225,14 +225,8 @@ class OptiManager:
                 opti.show(with_wrn=False)
 
     def show_plot(self, fpath=None, name_map=None, name_spec=None, colors=None,
-                  scale=1., lim_x=None, lim_y=None, ylog=False):
+                  scale=1., title=None, lim_x=None, lim_y=None):
         self.check_group_for_show()
-
-        if colors is None:
-            colors = [
-                '#000099', '#FFB300', '#00B454', '#333300', '#CE0071',
-                '#804000', '#FFF800', '#66ffcc', '#cc0000', '#558000',
-                '#ff66ff', '#6699ff', '#003300', '#cc6699']
 
         data = {}
         for bm in self.bms:
@@ -240,7 +234,7 @@ class OptiManager:
             data[name] = bm.get_lists()
 
         plot_deps(data, colors, path(fpath, 'png'), name_spec,
-            lim_x=lim_x, lim_y=lim_y, ylog=ylog)
+            lim_x=lim_x, lim_y=lim_y, title=title)
 
     def show_table(self, prefix='', postfix='', prec=2, kind='mean',
                    is_time=False, prefix_inner='    & ', fail='FAIL',
