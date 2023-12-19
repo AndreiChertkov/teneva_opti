@@ -9,5 +9,5 @@ pandas<=1.5.3
 protes==0.3.5
 seaborn==0.12.2
 teneva>=0.14.7
-teneva_bm==0.8.4
+teneva_bm==0.8.6
 ttopt==0.6.2

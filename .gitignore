@@ -9,7 +9,17 @@
 __pycache__/
 build/
 dist/
+
+_audio/
+_doc/
+_pack/
+_share/
+_slides/
+_text/
 _tmp/
+_video/
+_.md
+
 result/
 result_demo/
 result_demo_manager/
