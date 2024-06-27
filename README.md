@@ -1,6 +1,9 @@
 # teneva_opti
 
 
+> **Archived** The code from this repository has been moved to https://github.com/AIRI-Institute/teneva_opti. Work on this repository has been stopped, the code will not be updated. When installing via pip, the version of the code from the new repository will be used. **Please do not use this repository.**
+
+
 ## Description
 
 Collection of various optimization methods (search for the global minimum and/or maximum) for multivariate functions and multidimensional data arrays (tensors). This library is based on a software product [teneva](https://github.com/AndreiChertkov/teneva). See also related benchmarks library [teneva_bm](https://github.com/AndreiChertkov/teneva_bm).
